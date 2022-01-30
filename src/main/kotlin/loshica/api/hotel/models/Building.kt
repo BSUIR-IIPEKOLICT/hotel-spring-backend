@@ -6,16 +6,15 @@ import loshica.api.hotel.shared.FieldName
 import javax.persistence.*
 
 @Entity
-class Review(
-    @field:JsonProperty(FieldName.roomId) val roomId: Int = 0,
-    val author: String = "",
-    var content: String = "",
+class Building(
+    @field:JsonProperty(FieldName.roomsIds) val roomsIds: Int = 0,
+    @Column(unique = true) var address: String = "",
 
     @Id @GeneratedValue @field:JsonProperty(FieldName.id) val id: Int = 0
 ) {
 
-    @JsonGetter(FieldName.roomId)
-    fun getRoomId(): String = this.roomId.toString()
+    @JsonGetter(FieldName.roomsIds)
+    fun getRoomsIds(): String = this.roomsIds.toString()
 
     @JsonGetter(FieldName.id)
     fun getId(): String = this.id.toString()
