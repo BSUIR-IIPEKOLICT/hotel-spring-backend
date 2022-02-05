@@ -1,5 +1,6 @@
 package loshica.api.hotel.services
 
+import loshica.api.hotel.models.Building
 import loshica.api.hotel.models.Review
 import loshica.api.hotel.models.Room
 import loshica.api.hotel.repositories.RoomRepository
@@ -15,7 +16,7 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
         var rooms: Iterable<Room> = roomRepository.findAll()
 
         if (buildingId != null) {
-            rooms = rooms.filter { room: Room -> room.building == buildingId.toInt() }
+            rooms = rooms.filter { room: Room -> room.building.id == buildingId.toInt() }
         }
 
         if (typeId != null) {
@@ -51,16 +52,16 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
     fun getAmount(buildingId: String?, typeId: String?, isFree: Boolean?): Int =
         this.getByQuery(buildingId, typeId, isFree).count()
 
-    fun create(buildingId: Int, typeId: Int): Room {
-        val room = Room(building = buildingId, type = typeId)
+    fun create(building: Building, type: Int): Room {
+        val room = Room(building = building, type = type)
         roomRepository.save(room)
         return room
     }
 
-    fun change(id: Int, buildingId: Int, typeId: Int): Room {
+    fun change(id: Int, building: Building, type: Int): Room {
         val room: Room = this.getOne(id)
-        room.building = buildingId
-        room.type = typeId
+        room.building = building
+        room.type = type
         roomRepository.save(room)
         return room
     }

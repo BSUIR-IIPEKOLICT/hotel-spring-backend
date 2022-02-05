@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.review)
-class ReviewController(private val reviewService: ReviewService, private val roomService: RoomService) {
+class ReviewController(
+    private val reviewService: ReviewService,
+    private val roomService: RoomService
+) {
 
     @GetMapping
     fun getAll(@RequestParam _room: Int): Iterable<Review> {
@@ -28,12 +31,13 @@ class ReviewController(private val reviewService: ReviewService, private val roo
 
     @PatchMapping
     @ResponseBody
-    fun change(@RequestBody dto: ReviewDto): Review {
-        return reviewService.change(dto._id.toInt(), dto.content)
-    }
+    fun change(@RequestBody dto: ReviewDto): Review = reviewService.change(
+        id = dto._id.toInt(),
+        content = dto.content
+    )
 
     @DeleteMapping
-    fun delete(@RequestBody dto: ReviewDto): String {
-        return reviewService.delete(dto._id.toInt()).toString()
-    }
+    fun delete(@RequestBody dto: ReviewDto): String = reviewService
+        .delete(id = dto._id.toInt())
+        .toString()
 }

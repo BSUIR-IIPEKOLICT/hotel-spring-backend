@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 class Room(
-    @field:JsonProperty(FieldName.building) var building: Int = 0,
+    @ManyToOne @field:JsonProperty(FieldName.building) var building: Building,
     @field:JsonProperty(FieldName.type) var type: Int = 0,
     @field:JsonProperty(FieldName.order) var orderField: Int? = null,
     @field:JsonProperty(FieldName.isFree) var isFree: Boolean = true,
@@ -35,4 +35,17 @@ class Room(
 
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()
+
+    override fun toString(): String {
+        return """
+            {
+                "_id": "${this.convertId()}",
+                "_building": "${this.building}",
+                "_type": "${this.type}",
+                "_order": ${this.convertOrder()},
+                "isFree": ${this.convertIsFree()}
+                "population": ${this.population}
+            }
+        """.trimIndent()
+    }
 }

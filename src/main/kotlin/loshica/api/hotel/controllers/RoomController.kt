@@ -1,7 +1,9 @@
 package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.RoomDto
+import loshica.api.hotel.models.Building
 import loshica.api.hotel.models.Room
+import loshica.api.hotel.services.BuildingService
 import loshica.api.hotel.services.RoomService
 import loshica.api.hotel.shared.Constants
 import loshica.api.hotel.shared.Route
@@ -9,7 +11,10 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.room)
-class RoomController(private val roomService: RoomService) {
+class RoomController(
+    private val roomService: RoomService,
+    private val buildingService: BuildingService
+) {
 
     @GetMapping
     fun get(
@@ -34,21 +39,24 @@ class RoomController(private val roomService: RoomService) {
 
     @PostMapping
     @ResponseBody
-    fun create(@RequestBody dto: RoomDto): Room = roomService.create(
-        dto._building.toInt(),
-        dto._type.toInt()
-    )
+    fun create(@RequestBody dto: RoomDto): Room {
+        val building: Building = buildingService.getOne(dto._building.toInt())
+        return roomService.create(building = building, type = dto._type.toInt())
+    }
 
     @PatchMapping
     @ResponseBody
-    fun change(@RequestBody dto: RoomDto): Room = roomService.change(
-        id = dto._id.toInt(),
-        buildingId = dto._building.toInt(),
-        typeId = dto._type.toInt()
-    )
+    fun change(@RequestBody dto: RoomDto): Room {
+        val building: Building = buildingService.getOne(dto._building.toInt())
+        return roomService.change(
+            id = dto._id.toInt(),
+            building = building,
+            type = dto._type.toInt()
+        )
+    }
 
     @DeleteMapping
-    fun delete(@RequestBody dto: RoomDto): String {
-        return roomService.delete(dto._id.toInt()).toString()
-    }
+    fun delete(@RequestBody dto: RoomDto): String = roomService
+        .delete(id = dto._id.toInt())
+        .toString()
 }
