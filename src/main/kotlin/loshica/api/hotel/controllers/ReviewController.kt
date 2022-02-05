@@ -2,23 +2,28 @@ package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.ReviewDto
 import loshica.api.hotel.models.Review
+import loshica.api.hotel.models.Room
 import loshica.api.hotel.services.ReviewService
+import loshica.api.hotel.services.RoomService
+import loshica.api.hotel.shared.Constants
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.review)
-class ReviewController(private val reviewService: ReviewService) {
+class ReviewController(private val reviewService: ReviewService, private val roomService: RoomService) {
 
     @GetMapping
-    fun getAll(@RequestParam _room: String): Iterable<Review> {
-        return reviewService.getByRoom(_room.toInt())
+    fun getAll(@RequestParam _room: Int): Iterable<Review> {
+        val room: Room = roomService.getOne(_room)
+        return reviewService.getByRoom(room)
     }
 
     @PostMapping
     @ResponseBody
     fun create(@RequestBody dto: ReviewDto): Review {
-        return reviewService.create(dto._room.toInt(), dto.author, dto.content)
+        val room: Room = roomService.getOne(dto._room.toInt())
+        return reviewService.create(room, dto.author, dto.content)
     }
 
     @PatchMapping

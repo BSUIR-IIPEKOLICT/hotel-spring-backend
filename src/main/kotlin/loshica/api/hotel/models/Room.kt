@@ -7,24 +7,32 @@ import javax.persistence.*
 
 @Entity
 class Room(
-    @field:JsonProperty(FieldName.buildingId) var buildingId: Int = 0,
-    @field:JsonProperty(FieldName.typeId) var typeId: Int = 0,
-    @field:JsonProperty(FieldName.orderId) var orderId: Int? = null,
-    var isFree: Boolean = true,
+    @field:JsonProperty(FieldName.building) var building: Int = 0,
+    @field:JsonProperty(FieldName.type) var type: Int = 0,
+    @field:JsonProperty(FieldName.order) var orderField: Int? = null,
+    @field:JsonProperty(FieldName.isFree) var isFree: Boolean = true,
     var population: Int = 0,
 
-    @Id @GeneratedValue @field:JsonProperty(FieldName.id) val id: Int = 0
+    @OneToMany var reviews: MutableList<Review> = mutableListOf(),
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @field:JsonProperty(FieldName.id)
+    val id: Int = 0
 ) {
 
-    @JsonGetter(FieldName.buildingId)
-    fun getBuildingId(): String = this.buildingId.toString()
+    @JsonGetter(FieldName.building)
+    fun convertBuilding(): String = this.building.toString()
 
-    @JsonGetter(FieldName.typeId)
-    fun getTypeId(): String = this.typeId.toString()
+    @JsonGetter(FieldName.type)
+    fun convertType(): String = this.type.toString()
 
-    @JsonGetter(FieldName.orderId)
-    fun getOrderId(): String = this.orderId.toString()
+    @JsonGetter(FieldName.order)
+    fun convertOrder(): String? = this.orderField?.toString()
+
+    @JsonGetter(FieldName.isFree)
+    fun convertIsFree(): Boolean = this.isFree
 
     @JsonGetter(FieldName.id)
-    fun getId(): String = this.id.toString()
+    fun convertId(): String = this.id.toString()
 }

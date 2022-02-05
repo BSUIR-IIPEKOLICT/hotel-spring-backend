@@ -2,18 +2,19 @@ package loshica.api.hotel.shared
 
 object Route {
     const val test = "/test"
+    const val api = "/api"
 
-    const val basket = "/basket"
-    const val building = "/building"
-    const val order = "/order"
-    const val review = "/review"
-    const val room = "/room"
-    const val service = "/service"
-    const val type = "/type"
-    const val user = "/user"
+    const val basket = "$api/basket"
+    const val building = "$api/building"
+    const val order = "$api/order"
+    const val review = "$api/review"
+    const val room = "$api/room"
+    const val service = "$api/service"
+    const val type = "$api/type"
+    const val user = "$api/user"
 
-    const val currentBasket = "$basket/current"
+    const val current = "/current"
     const val register = "/register"
     const val login = "/login"
-    const val auth = "/current"
+    const val auth = "/auth"
 }

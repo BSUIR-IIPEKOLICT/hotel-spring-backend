@@ -5,4 +5,7 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface RoomRepository : CrudRepository<Room, Int> {}
+interface RoomRepository : CrudRepository<Room, Int> {
+//    fun deleteRoomByBuilding(building: Int)
+//    fun deleteRoomByType(type: Int)
+}

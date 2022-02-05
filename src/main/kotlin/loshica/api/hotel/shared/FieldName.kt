@@ -2,13 +2,15 @@ package loshica.api.hotel.shared
 
 object FieldName {
     const val id = "_id"
-    const val roomId = "_room"
-    const val servicesIds = "_services"
-    const val roomsIds = "_rooms"
-    const val userId = "_user"
-    const val ordersIds = "_orders"
-    const val buildingId = "_building"
-    const val typeId = "_type"
-    const val orderId = "_order"
-    const val basketId = "_basket"
+    const val room = "_room"
+    const val services = "_services"
+    const val rooms = "_rooms"
+    const val user= "_user"
+    const val orders = "_orders"
+    const val building = "_building"
+    const val type = "_type"
+    const val order = "_order"
+    const val basket = "_basket"
+
+    const val isFree = "isFree"
 }

@@ -7,16 +7,19 @@ import javax.persistence.*
 
 @Entity
 class Review(
-    @field:JsonProperty(FieldName.roomId) val roomId: Int = 0,
+    @ManyToOne @field:JsonProperty(FieldName.room) val room: Room,
     val author: String = "",
     var content: String = "",
 
-    @Id @GeneratedValue @field:JsonProperty(FieldName.id) val id: Int = 0
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @field:JsonProperty(FieldName.id)
+    val id: Int = 0
 ) {
 
-    @JsonGetter(FieldName.roomId)
-    fun getRoomId(): String = this.roomId.toString()
+    @JsonGetter(FieldName.room)
+    fun convertRoom(): String = this.room.id.toString()
 
     @JsonGetter(FieldName.id)
-    fun getId(): String = this.id.toString()
+    fun convertId(): String = this.id.toString()
 }
