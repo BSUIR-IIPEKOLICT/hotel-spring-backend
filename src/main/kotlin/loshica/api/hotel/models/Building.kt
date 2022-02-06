@@ -9,7 +9,9 @@ import javax.persistence.*
 class Building(
     @Column(unique = true) var address: String = "",
 
-    @OneToMany @field:JsonProperty(FieldName.rooms) var rooms: MutableList<Room> = mutableListOf(),
+    @OneToMany
+    @field:JsonProperty(FieldName.rooms)
+    var rooms: MutableList<Room> = mutableListOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,18 +20,14 @@ class Building(
 ) {
 
     @JsonGetter(FieldName.rooms)
-    fun convertRooms(): List<String> = this.rooms.map { room: Room -> room.id.toString() }
+    fun convertRooms(): List<String> = this.rooms.map {
+        room: Room -> "${room.id}"
+    }
 
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()
 
-    override fun toString(): String {
-        return """
-            {
-                "id": "${this.convertId()}",
-                "_rooms": ${this.convertRooms()},
-                "address": "${this.address}"
-            }
-        """.trimIndent()
+    fun change(address: String) {
+        this.address = address
     }
 }

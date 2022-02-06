@@ -3,6 +3,7 @@ package loshica.api.hotel.services
 import loshica.api.hotel.models.Building
 import loshica.api.hotel.models.Review
 import loshica.api.hotel.models.Room
+import loshica.api.hotel.models.Type
 import loshica.api.hotel.repositories.RoomRepository
 import loshica.api.hotel.shared.Constants
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,19 +13,29 @@ import org.springframework.stereotype.Service
 @Service
 class RoomService(@Autowired private val roomRepository: RoomRepository) {
 
-    private fun getByQuery(buildingId: String?, typeId: String?, isFree: Boolean?): Iterable<Room> {
+    private fun getByQuery(
+        buildingId: String?,
+        typeId: String?,
+        isFree: Boolean?
+    ): Iterable<Room> {
         var rooms: Iterable<Room> = roomRepository.findAll()
 
         if (buildingId != null) {
-            rooms = rooms.filter { room: Room -> room.building.id == buildingId.toInt() }
+            rooms = rooms.filter {
+                room: Room -> room.building.id == buildingId.toInt()
+            }
         }
 
         if (typeId != null) {
-            rooms = rooms.filter { room: Room -> room.type == typeId.toInt() }
+            rooms = rooms.filter {
+                room: Room -> room.type.id == typeId.toInt()
+            }
         }
 
         if (isFree != null) {
-            rooms = rooms.filter { room: Room -> room.isFree == isFree }
+            rooms = rooms.filter {
+                room: Room -> room.isFree == isFree
+            }
         }
 
         return rooms
@@ -47,21 +58,26 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
             .map { indexedValue: IndexedValue<Room> -> indexedValue.value }
     }
 
-    fun getOne(id: Int): Room = roomRepository.findByIdOrNull(id) ?: throw Exception(Constants.notFoundMessage)
+    fun getOne(id: Int): Room = roomRepository
+        .findByIdOrNull(id)
+        ?: throw Exception(Constants.notFoundMessage)
 
-    fun getAmount(buildingId: String?, typeId: String?, isFree: Boolean?): Int =
-        this.getByQuery(buildingId, typeId, isFree).count()
+    fun getAmount(
+        buildingId: String?,
+        typeId: String?,
+        isFree: Boolean?
+    ): Int = getByQuery(buildingId, typeId, isFree).count()
 
-    fun create(building: Building, type: Int): Room {
+    fun create(building: Building, type: Type): Room {
+        print("$building, $type")
         val room = Room(building = building, type = type)
         roomRepository.save(room)
         return room
     }
 
-    fun change(id: Int, building: Building, type: Int): Room {
+    fun change(id: Int, building: Building, type: Type): Room {
         val room: Room = this.getOne(id)
-        room.building = building
-        room.type = type
+        room.change(building = building, type = type)
         roomRepository.save(room)
         return room
     }
@@ -80,17 +96,13 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
 
     fun bookRoom(id: Int, orderId: Int, population: Int) {
         val room: Room = this.getOne(id)
-        room.orderField = orderId
-        room.population = population
-        room.isFree = false
+        room.book(order = orderId, population = population)
         roomRepository.save(room)
     }
 
     fun unBookRoom(id: Int) {
         val room: Room = this.getOne(id)
-        room.orderField = null
-        room.population = 0
-        room.isFree = true
+        room.unBook()
         roomRepository.save(room)
     }
 

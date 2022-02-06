@@ -10,6 +10,8 @@ class Service(
     @Column(unique = true) var name: String = "",
     var price: Int = 0,
 
+    @ManyToMany var types: MutableList<Type> = mutableListOf(),
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @field:JsonProperty(FieldName.id)
@@ -19,13 +21,8 @@ class Service(
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()
 
-    override fun toString(): String {
-        return """
-            {
-                "_id": "${this.convertId()}",
-                "name": "${this.name}",
-                "price": ${this.price}
-            }
-        """.trimIndent()
+    fun change(name: String, price: Int) {
+        this.name = name
+        this.price = price
     }
 }

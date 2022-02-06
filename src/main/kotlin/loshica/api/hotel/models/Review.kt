@@ -22,4 +22,8 @@ class Review(
 
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()
+
+    fun change(content: String) {
+        this.content = content
+    }
 }

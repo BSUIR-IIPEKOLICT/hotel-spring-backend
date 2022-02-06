@@ -8,7 +8,7 @@ import javax.persistence.*
 @Entity
 class Room(
     @ManyToOne @field:JsonProperty(FieldName.building) var building: Building,
-    @field:JsonProperty(FieldName.type) var type: Int = 0,
+    @ManyToOne @field:JsonProperty(FieldName.type) var type: Type,
     @field:JsonProperty(FieldName.order) var orderField: Int? = null,
     @field:JsonProperty(FieldName.isFree) var isFree: Boolean = true,
     var population: Int = 0,
@@ -21,12 +21,6 @@ class Room(
     val id: Int = 0
 ) {
 
-    @JsonGetter(FieldName.building)
-    fun convertBuilding(): String = this.building.toString()
-
-    @JsonGetter(FieldName.type)
-    fun convertType(): String = this.type.toString()
-
     @JsonGetter(FieldName.order)
     fun convertOrder(): String? = this.orderField?.toString()
 
@@ -36,16 +30,20 @@ class Room(
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()
 
-    override fun toString(): String {
-        return """
-            {
-                "_id": "${this.convertId()}",
-                "_building": "${this.building}",
-                "_type": "${this.type}",
-                "_order": ${this.convertOrder()},
-                "isFree": ${this.convertIsFree()}
-                "population": ${this.population}
-            }
-        """.trimIndent()
+    fun change(building: Building, type: Type) {
+        this.building = building
+        this.type = type
+    }
+
+    fun book(order: Int, population: Int) {
+        this.isFree = false
+        this.orderField = order
+        this.population = population
+    }
+
+    fun unBook() {
+        this.isFree = true
+        this.orderField = null
+        this.population = 0
     }
 }

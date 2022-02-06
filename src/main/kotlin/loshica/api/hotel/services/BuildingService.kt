@@ -12,8 +12,9 @@ class BuildingService(@Autowired private val buildingRepository: BuildingReposit
 
     fun getAll(): Iterable<Building> = buildingRepository.findAll()
 
-    fun getOne(id: Int): Building =
-        buildingRepository.findByIdOrNull(id) ?: throw Exception(Constants.notFoundMessage)
+    fun getOne(id: Int): Building = buildingRepository
+        .findByIdOrNull(id)
+        ?: throw Exception(Constants.notFoundMessage)
 
     fun create(address: String): Building {
         val building = Building(address = address)
@@ -23,7 +24,7 @@ class BuildingService(@Autowired private val buildingRepository: BuildingReposit
 
     fun change(id: Int, address: String): Building {
         val building: Building = this.getOne(id)
-        building.address = address
+        building.change(address = address)
         buildingRepository.save(building)
         return building
     }

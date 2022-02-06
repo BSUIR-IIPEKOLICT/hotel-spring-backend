@@ -1,7 +1,6 @@
 package loshica.api.hotel.shared
 
 object Route {
-    const val test = "/test"
     const val api = "/api"
 
     const val basket = "$api/basket"

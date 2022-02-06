@@ -5,7 +5,6 @@ import loshica.api.hotel.models.Review
 import loshica.api.hotel.models.Room
 import loshica.api.hotel.services.ReviewService
 import loshica.api.hotel.services.RoomService
-import loshica.api.hotel.shared.Constants
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
 

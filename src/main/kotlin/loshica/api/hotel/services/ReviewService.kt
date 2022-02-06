@@ -13,7 +13,9 @@ class ReviewService(@Autowired private val reviewRepository: ReviewRepository) {
 
     fun getByRoom(room: Room): Iterable<Review> = reviewRepository.findByRoom(room)
 
-    fun getOne(_id: Int): Review? = reviewRepository.findByIdOrNull(_id)
+    fun getOne(id: Int): Review = reviewRepository
+        .findByIdOrNull(id)
+        ?: throw Exception(Constants.notFoundMessage)
 
     fun create(roomId: Room, author: String, content: String): Review {
         val review = Review(roomId, author, content)
@@ -22,8 +24,8 @@ class ReviewService(@Autowired private val reviewRepository: ReviewRepository) {
     }
 
     fun change(id: Int, content: String): Review {
-        val review: Review = reviewRepository.findByIdOrNull(id) ?: throw Exception(Constants.notFoundMessage)
-        review.content = content
+        val review: Review = this.getOne(id)
+        review.change(content = content)
         reviewRepository.save(review)
         return review
     }

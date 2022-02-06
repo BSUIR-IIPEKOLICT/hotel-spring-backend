@@ -12,7 +12,8 @@ class ServiceService(@Autowired private val serviceRepository: ServiceRepository
     fun getAll(): Iterable<loshica.api.hotel.models.Service> = serviceRepository.findAll()
 
     fun getOne(id: Int): loshica.api.hotel.models.Service = serviceRepository
-        .findByIdOrNull(id) ?: throw Exception(Constants.notFoundMessage)
+        .findByIdOrNull(id)
+        ?: throw Exception(Constants.notFoundMessage)
 
     fun create(name: String, price: Int): loshica.api.hotel.models.Service {
         val service = loshica.api.hotel.models.Service(name = name, price = price)
@@ -22,8 +23,7 @@ class ServiceService(@Autowired private val serviceRepository: ServiceRepository
 
     fun change(id: Int, name: String, price: Int): loshica.api.hotel.models.Service {
         val service: loshica.api.hotel.models.Service = this.getOne(id)
-        service.name = name
-        service.price = price
+        service.change(name = name, price = price)
         serviceRepository.save(service)
         return service
     }
