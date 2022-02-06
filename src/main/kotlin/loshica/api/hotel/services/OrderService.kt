@@ -1,26 +1,23 @@
 package loshica.api.hotel.services
 
+import loshica.api.hotel.core.BaseService
 import loshica.api.hotel.models.*
 import loshica.api.hotel.repositories.OrderRepository
 import loshica.api.hotel.shared.BaseOrderDto
-import loshica.api.hotel.shared.Constants
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class OrderService(@Autowired private val orderRepository: OrderRepository) {
+class OrderService(
+    @Autowired override val repository: OrderRepository
+) : BaseService<Order, OrderRepository>(repository) {
 
-    fun get(basket: Int): Iterable<Order> = orderRepository.findByBasket(
+    fun get(basket: Basket): Iterable<Order> = repository.findByBasket(
         basket = basket
     )
 
-    fun getOne(id: Int): Order = orderRepository
-        .findByIdOrNull(id)
-        ?: throw Exception(Constants.notFoundMessage)
-
     fun create(
-        basket: Int,
+        basket: Basket,
         room: Room,
         services: List<loshica.api.hotel.models.Service>,
         duty: Int,
@@ -35,14 +32,15 @@ class OrderService(@Autowired private val orderRepository: OrderRepository) {
             population = population,
             date = date
         )
-        orderRepository.save(order)
+        repository.save(order)
         return order.convertToBaseDto()
     }
 
-    fun delete(id: Int): Int {
-        orderRepository.deleteById(id)
-        return id
+    fun deleteWithBasket(basket: Basket) {
+        repository.findByBasket(basket).forEach { repository.delete(it) }
     }
 
-    fun deleteWithBasket(basket: Int) = orderRepository.deleteByBasket(basket)
+    fun deleteWithRoom(room: Room) {
+        repository.findByRoom(room).forEach { repository.delete(it) }
+    }
 }

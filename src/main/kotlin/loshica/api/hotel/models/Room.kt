@@ -14,7 +14,7 @@ class Room(
     @field:JsonProperty(FieldName.isFree) var isFree: Boolean = true,
     var population: Int = 0,
 
-    @OneToMany var reviews: MutableList<Review> = mutableListOf(),
+//    @OneToMany var reviews: MutableList<Review> = mutableListOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

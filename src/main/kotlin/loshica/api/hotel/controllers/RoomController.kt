@@ -1,12 +1,9 @@
 package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.RoomDto
-import loshica.api.hotel.models.Building
-import loshica.api.hotel.models.Room
-import loshica.api.hotel.models.Type
-import loshica.api.hotel.services.BuildingService
-import loshica.api.hotel.services.RoomService
-import loshica.api.hotel.services.TypeService
+import loshica.api.hotel.models.*
+import loshica.api.hotel.responses.RoomsWithAmountResponse
+import loshica.api.hotel.services.*
 import loshica.api.hotel.shared.Constants
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
@@ -16,7 +13,10 @@ import org.springframework.web.bind.annotation.*
 class RoomController(
     private val roomService: RoomService,
     private val buildingService: BuildingService,
-    private val typeService: TypeService
+    private val typeService: TypeService,
+    private val reviewService: ReviewService,
+    private val orderService: OrderService,
+    private val basketService: BasketService
 ) {
 
     @GetMapping
@@ -26,17 +26,24 @@ class RoomController(
         @RequestParam isFree: Boolean?,
         @RequestParam page: Int?,
         @RequestParam limit: Int?
-    ): Iterable<Room> {
+    ): RoomsWithAmountResponse {
         val requestPage: Int = page ?: 1
         val requestLimit: Int = limit ?: Constants.roomLimit
         val offset: Int = requestPage * requestLimit - requestLimit
 
-        return roomService.get(
-            buildingId = _building,
-            typeId = _type,
-            isFree = isFree,
-            limit = requestLimit,
-            offset = offset
+        return RoomsWithAmountResponse(
+            rooms = roomService.get(
+                buildingId = _building,
+                typeId = _type,
+                isFree = isFree,
+                limit = requestLimit,
+                offset = offset
+            ),
+            amount = roomService.getAmount(
+                buildingId = _building,
+                typeId = _type,
+                isFree = isFree
+            )
         )
     }
 
@@ -45,7 +52,10 @@ class RoomController(
     fun create(@RequestBody dto: RoomDto): Room {
         val building: Building = buildingService.getOne(dto._building.toInt())
         val type: Type = typeService.getOne(dto._type.toInt())
-        return roomService.create(building = building, type = type)
+        val room: Room = roomService.create(building = building, type = type)
+
+        buildingService.addRoom(room)
+        return room
     }
 
     @PatchMapping
@@ -53,15 +63,32 @@ class RoomController(
     fun change(@RequestBody dto: RoomDto): Room {
         val building: Building = buildingService.getOne(dto._building.toInt())
         val type: Type = typeService.getOne(dto._type.toInt())
-        return roomService.change(
+        var room: Room = roomService.getOne(dto._id.toInt())
+
+        buildingService.removeRoom(room)
+        room = roomService.change(
             id = dto._id.toInt(),
             building = building,
             type = type
         )
+        buildingService.addRoom(room)
+
+        return room
     }
 
     @DeleteMapping
-    fun delete(@RequestBody dto: RoomDto): String = roomService
-        .delete(id = dto._id.toInt())
-        .toString()
+    fun delete(@RequestBody dto: RoomDto): String {
+        val room: Room = roomService.getOne(dto._id.toInt())
+        buildingService.removeRoom(room)
+        reviewService.deleteWithRoom(room)
+
+        room.orderField?.let {
+            basketService.removeOrder(it)
+            orderService.delete(it.id)
+        }
+
+        return roomService
+            .delete(id = dto._id.toInt())
+            .toString()
+    }
 }

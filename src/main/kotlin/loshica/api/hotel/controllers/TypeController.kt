@@ -1,7 +1,6 @@
 package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.TypeDto
-import loshica.api.hotel.models.Service
 import loshica.api.hotel.models.Type
 import loshica.api.hotel.services.ServiceService
 import loshica.api.hotel.services.TypeService
@@ -15,12 +14,6 @@ class TypeController(
     private val serviceService: ServiceService
 ) {
 
-    private fun convertServices(
-        services: List<String>
-    ): MutableList<Service> = services
-        .map { serviceService.getOne(it.toInt()) }
-        .toMutableList()
-
     @GetMapping
     fun getAll(): Iterable<Type> = typeService.getAll()
 
@@ -29,7 +22,7 @@ class TypeController(
     fun create(@RequestBody dto: TypeDto): Type = typeService.create(
         name = dto.name,
         places = dto.places,
-        services = convertServices(dto._services)
+        services = serviceService.getByIds(dto._services).toMutableList()
     )
 
     @PatchMapping
@@ -39,7 +32,7 @@ class TypeController(
         type.change(
             name = dto.name,
             places = dto.places,
-            services = convertServices(dto._services)
+            services = serviceService.getByIds(dto._services).toMutableList()
         )
         return type
     }

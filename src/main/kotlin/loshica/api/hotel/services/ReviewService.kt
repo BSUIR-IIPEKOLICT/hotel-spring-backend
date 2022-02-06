@@ -1,39 +1,33 @@
 package loshica.api.hotel.services
 
+import loshica.api.hotel.core.BaseService
 import loshica.api.hotel.models.Review
 import loshica.api.hotel.models.Room
 import loshica.api.hotel.repositories.ReviewRepository
-import loshica.api.hotel.shared.Constants
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class ReviewService(@Autowired private val reviewRepository: ReviewRepository) {
+class ReviewService(
+    @Autowired override val repository: ReviewRepository
+) : BaseService<Review, ReviewRepository>(repository) {
 
-    fun getByRoom(room: Room): Iterable<Review> = reviewRepository.findByRoom(room)
-
-    fun getOne(id: Int): Review = reviewRepository
-        .findByIdOrNull(id)
-        ?: throw Exception(Constants.notFoundMessage)
+    fun getByRoom(room: Room): Iterable<Review> = repository.findByRoom(room)
 
     fun create(roomId: Room, author: String, content: String): Review {
         val review = Review(roomId, author, content)
-        reviewRepository.save(review)
+        repository.save(review)
         return review
     }
 
     fun change(id: Int, content: String): Review {
         val review: Review = this.getOne(id)
         review.change(content = content)
-        reviewRepository.save(review)
+        repository.save(review)
         return review
     }
 
-    fun delete(id: Int): Int {
-        reviewRepository.deleteById(id)
-        return id
+    fun deleteWithRoom(room: Room) {
+        repository.findByRoom(room).forEach { repository.delete(it) }
     }
-
-    fun deleteWithRoom(room: Room) = reviewRepository.deleteByRoom(room)
 }

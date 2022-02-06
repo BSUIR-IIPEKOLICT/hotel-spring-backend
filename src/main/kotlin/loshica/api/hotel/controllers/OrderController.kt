@@ -12,22 +12,25 @@ import org.springframework.web.bind.annotation.*
 class OrderController(
     private val orderService: OrderService,
     private val roomService: RoomService,
-    private val serviceService: ServiceService
+    private val serviceService: ServiceService,
+    private val basketService: BasketService
 ) {
 
     @GetMapping
     fun get(@RequestParam _basket: String): Iterable<Order> {
-        return orderService.get(basket = _basket.toInt())
+        val basket: Basket = basketService.getOne(_basket.toInt())
+        return orderService.get(basket = basket)
     }
 
     @PostMapping
     @ResponseBody
     fun create(@RequestBody dto: OrderDto): BaseOrderDto {
+        val basket: Basket = basketService.getOne(dto._basket.toInt())
         val room: Room = roomService.getOne(dto._room.toInt())
         val services: Iterable<Service> = serviceService.getByIds(dto._services)
 
         return orderService.create(
-            basket = dto._basket.toInt(),
+            basket = basket,
             room = room,
             services = services.toMutableList(),
             duty = dto.duty,

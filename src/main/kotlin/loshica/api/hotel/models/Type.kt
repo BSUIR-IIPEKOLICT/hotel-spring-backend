@@ -14,7 +14,7 @@ class Type(
     @field:JsonProperty(FieldName.services)
     var services: MutableList<Service> = mutableListOf(),
 
-    @OneToMany var rooms: MutableList<Room> = mutableListOf(),
+//    @OneToMany var rooms: MutableList<Room> = mutableListOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

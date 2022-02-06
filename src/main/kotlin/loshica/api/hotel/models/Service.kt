@@ -10,7 +10,7 @@ class Service(
     @Column(unique = true) var name: String = "",
     var price: Int = 0,
 
-    @ManyToMany var types: MutableList<Type> = mutableListOf(),
+//    @ManyToMany var types: MutableList<Type> = mutableListOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

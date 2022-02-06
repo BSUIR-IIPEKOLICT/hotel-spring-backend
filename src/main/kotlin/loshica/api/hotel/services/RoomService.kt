@@ -1,21 +1,22 @@
 package loshica.api.hotel.services
 
+import loshica.api.hotel.core.BaseService
 import loshica.api.hotel.models.*
 import loshica.api.hotel.repositories.RoomRepository
-import loshica.api.hotel.shared.Constants
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class RoomService(@Autowired private val roomRepository: RoomRepository) {
+class RoomService(
+    @Autowired override val repository: RoomRepository
+) : BaseService<Room, RoomRepository>(repository) {
 
     private fun getByQuery(
         buildingId: String?,
         typeId: String?,
         isFree: Boolean?
     ): Iterable<Room> {
-        var rooms: Iterable<Room> = roomRepository.findAll()
+        var rooms: Iterable<Room> = repository.findAll()
 
         if (buildingId != null) {
             rooms = rooms.filter {
@@ -45,7 +46,7 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
         limit: Int = Int.MAX_VALUE,
         offset: Int = 0
     ): Iterable<Room> {
-        val rooms: Iterable<Room> = this.getByQuery(buildingId, typeId, isFree)
+        val rooms: Iterable<Room> = getByQuery(buildingId, typeId, isFree)
 
         return rooms
             .withIndex()
@@ -55,59 +56,37 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
             .map { indexedValue: IndexedValue<Room> -> indexedValue.value }
     }
 
-    fun getOne(id: Int): Room = roomRepository
-        .findByIdOrNull(id)
-        ?: throw Exception(Constants.notFoundMessage)
-
     fun getAmount(
         buildingId: String?,
         typeId: String?,
         isFree: Boolean?
     ): Int = getByQuery(buildingId, typeId, isFree).count()
 
+    fun getByBuilding(building: Building): Iterable<Room> = repository
+        .findByBuilding(building)
+
     fun create(building: Building, type: Type): Room {
         val room = Room(building = building, type = type)
-        roomRepository.save(room)
+        repository.save(room)
         return room
     }
 
     fun change(id: Int, building: Building, type: Type): Room {
         val room: Room = this.getOne(id)
         room.change(building = building, type = type)
-        roomRepository.save(room)
+        repository.save(room)
         return room
-    }
-
-    fun addReview(id: Int, review: Review) {
-        val room: Room = this.getOne(id)
-        room.reviews.add(review)
-        roomRepository.save(room)
-    }
-
-    fun removeReview(id: Int, review: Review) {
-        val room: Room = this.getOne(id)
-        room.reviews.remove(review)
-        roomRepository.save(room)
     }
 
     fun bookRoom(id: Int, order: Order, population: Int) {
         val room: Room = this.getOne(id)
         room.book(order = order, population = population)
-        roomRepository.save(room)
+        repository.save(room)
     }
 
     fun unBookRoom(id: Int) {
         val room: Room = this.getOne(id)
         room.unBook()
-        roomRepository.save(room)
+        repository.save(room)
     }
-
-    fun delete(id: Int): Int {
-        roomRepository.deleteById(id)
-        return id
-    }
-
-//    fun deleteWithBuilding(buildingId: Int) = roomRepository.deleteRoomByBuilding(buildingId)
-//
-//    fun deleteWithType(typeId: Int) = roomRepository.deleteRoomByType(typeId)
 }

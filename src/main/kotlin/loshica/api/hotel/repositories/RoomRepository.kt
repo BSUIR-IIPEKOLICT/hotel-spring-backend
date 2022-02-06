@@ -1,11 +1,11 @@
 package loshica.api.hotel.repositories
 
+import loshica.api.hotel.models.Building
 import loshica.api.hotel.models.Room
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
 interface RoomRepository : CrudRepository<Room, Int> {
-//    fun deleteRoomByBuilding(building: Int)
-//    fun deleteRoomByType(type: Int)
+    fun findByBuilding(building: Building): Iterable<Room>
 }

@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ReviewRepository : CrudRepository<Review, Int> {
     fun findByRoom(room: Room): Iterable<Review>
-    fun deleteByRoom(room: Room)
 }

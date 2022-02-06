@@ -10,7 +10,10 @@ import javax.persistence.*
 
 @Entity(name = Constants.orderEntity)
 class Order(
-    @field:JsonProperty(FieldName.basket) val basket: Int = 0,
+    @ManyToOne
+    @field:JsonProperty(FieldName.basket)
+    val basket: Basket,
+
     @OneToOne @field:JsonProperty(FieldName.room) val room: Room,
 
     @ManyToMany
@@ -28,10 +31,7 @@ class Order(
 ) {
 
     @JsonGetter(FieldName.basket)
-    fun convertBasket(): String = this.basket.toString()
-
-    @JsonGetter(FieldName.room)
-    fun convertRoom(): String = this.room.toString()
+    fun convertBasket(): String = this.basket.id.toString()
 
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()

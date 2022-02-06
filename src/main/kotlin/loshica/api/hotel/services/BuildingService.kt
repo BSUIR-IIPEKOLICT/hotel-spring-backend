@@ -1,36 +1,41 @@
 package loshica.api.hotel.services
 
+import loshica.api.hotel.core.BaseService
 import loshica.api.hotel.models.Building
+import loshica.api.hotel.models.Room
 import loshica.api.hotel.repositories.BuildingRepository
-import loshica.api.hotel.shared.Constants
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class BuildingService(@Autowired private val buildingRepository: BuildingRepository) {
-
-    fun getAll(): Iterable<Building> = buildingRepository.findAll()
-
-    fun getOne(id: Int): Building = buildingRepository
-        .findByIdOrNull(id)
-        ?: throw Exception(Constants.notFoundMessage)
+class BuildingService(
+    @Autowired override val repository: BuildingRepository
+) : BaseService<Building, BuildingRepository>(repository) {
 
     fun create(address: String): Building {
         val building = Building(address = address)
-        buildingRepository.save(building)
+        repository.save(building)
         return building
     }
 
     fun change(id: Int, address: String): Building {
-        val building: Building = this.getOne(id)
+        val building: Building = getOne(id)
         building.change(address = address)
-        buildingRepository.save(building)
+        repository.save(building)
         return building
     }
 
-    fun delete(id: Int): Int {
-        buildingRepository.deleteById(id)
-        return id
+    fun addRoom(room: Room) {
+        room.building.let {
+            it.rooms.add(room)
+            repository.save(it)
+        }
+    }
+
+    fun removeRoom(room: Room) {
+        room.building.let {
+            it.rooms.remove(room)
+            repository.save(it)
+        }
     }
 }
