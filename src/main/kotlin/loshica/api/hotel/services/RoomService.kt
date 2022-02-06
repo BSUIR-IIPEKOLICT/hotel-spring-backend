@@ -1,9 +1,6 @@
 package loshica.api.hotel.services
 
-import loshica.api.hotel.models.Building
-import loshica.api.hotel.models.Review
-import loshica.api.hotel.models.Room
-import loshica.api.hotel.models.Type
+import loshica.api.hotel.models.*
 import loshica.api.hotel.repositories.RoomRepository
 import loshica.api.hotel.shared.Constants
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,7 +66,6 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
     ): Int = getByQuery(buildingId, typeId, isFree).count()
 
     fun create(building: Building, type: Type): Room {
-        print("$building, $type")
         val room = Room(building = building, type = type)
         roomRepository.save(room)
         return room
@@ -94,9 +90,9 @@ class RoomService(@Autowired private val roomRepository: RoomRepository) {
         roomRepository.save(room)
     }
 
-    fun bookRoom(id: Int, orderId: Int, population: Int) {
+    fun bookRoom(id: Int, order: Order, population: Int) {
         val room: Room = this.getOne(id)
-        room.book(order = orderId, population = population)
+        room.book(order = order, population = population)
         roomRepository.save(room)
     }
 

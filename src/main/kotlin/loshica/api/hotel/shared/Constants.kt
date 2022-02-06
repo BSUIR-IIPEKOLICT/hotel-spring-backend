@@ -5,4 +5,6 @@ object Constants {
     const val defaultRole = "client"
     const val notFoundMessage = "not found"
     const val roomLimit = 20
+    const val orderEntity = "order_e"
+    const val userEntity = "user_e"
 }

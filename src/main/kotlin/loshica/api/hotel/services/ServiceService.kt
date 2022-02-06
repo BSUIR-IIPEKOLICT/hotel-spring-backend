@@ -11,6 +11,10 @@ class ServiceService(@Autowired private val serviceRepository: ServiceRepository
 
     fun getAll(): Iterable<loshica.api.hotel.models.Service> = serviceRepository.findAll()
 
+    fun getByIds(
+        ids: List<String>
+    ): Iterable<loshica.api.hotel.models.Service> = ids.map { getOne(it.toInt()) }
+
     fun getOne(id: Int): loshica.api.hotel.models.Service = serviceRepository
         .findByIdOrNull(id)
         ?: throw Exception(Constants.notFoundMessage)

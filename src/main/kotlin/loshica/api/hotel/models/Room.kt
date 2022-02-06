@@ -3,13 +3,14 @@ package loshica.api.hotel.models
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonProperty
 import loshica.api.hotel.shared.FieldName
+import loshica.api.hotel.shared.BaseRoomDto
 import javax.persistence.*
 
 @Entity
 class Room(
     @ManyToOne @field:JsonProperty(FieldName.building) var building: Building,
     @ManyToOne @field:JsonProperty(FieldName.type) var type: Type,
-    @field:JsonProperty(FieldName.order) var orderField: Int? = null,
+    @OneToOne @field:JsonProperty(FieldName.order) var orderField: Order? = null,
     @field:JsonProperty(FieldName.isFree) var isFree: Boolean = true,
     var population: Int = 0,
 
@@ -22,7 +23,7 @@ class Room(
 ) {
 
     @JsonGetter(FieldName.order)
-    fun convertOrder(): String? = this.orderField?.toString()
+    fun convertOrder(): String? = this.orderField?.id?.toString()
 
     @JsonGetter(FieldName.isFree)
     fun convertIsFree(): Boolean = this.isFree
@@ -35,7 +36,7 @@ class Room(
         this.type = type
     }
 
-    fun book(order: Int, population: Int) {
+    fun book(order: Order, population: Int) {
         this.isFree = false
         this.orderField = order
         this.population = population
@@ -46,4 +47,13 @@ class Room(
         this.orderField = null
         this.population = 0
     }
+
+    fun convertToBaseDto(): BaseRoomDto = BaseRoomDto(
+        _building = this.building.id.toString(),
+        _type = this.type.id.toString(),
+        _order = this.convertOrder(),
+        isFree = this.convertIsFree(),
+        population = this.population,
+        _id = this.convertId()
+    )
 }
