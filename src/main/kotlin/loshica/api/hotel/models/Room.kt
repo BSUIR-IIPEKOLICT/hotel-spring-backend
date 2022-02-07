@@ -2,8 +2,8 @@ package loshica.api.hotel.models
 
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonProperty
+import loshica.api.hotel.responses.RoomResponse
 import loshica.api.hotel.shared.FieldName
-import loshica.api.hotel.shared.BaseRoomDto
 import javax.persistence.*
 
 @Entity
@@ -48,7 +48,7 @@ class Room(
         this.population = 0
     }
 
-    fun convertToBaseDto(): BaseRoomDto = BaseRoomDto(
+    fun convertToResponse(): RoomResponse = RoomResponse(
         _building = this.building.id.toString(),
         _type = this.type.id.toString(),
         _order = this.convertOrder(),

@@ -1,6 +1,8 @@
 package loshica.api.hotel.services
 
 import loshica.api.hotel.core.BaseService
+import loshica.api.hotel.errors.ApiError
+import loshica.api.hotel.errors.ErrorMessage
 import loshica.api.hotel.models.Basket
 import loshica.api.hotel.models.Order
 import loshica.api.hotel.models.User
@@ -13,7 +15,9 @@ class BasketService(
     @Autowired override val repository: BasketRepository
 ) : BaseService<Basket, BasketRepository>(repository) {
 
-    fun getByUser(user: User): Iterable<Basket> = repository.findByUser(user)
+    fun getByUser(user: User): Basket = repository
+        .findBasketByUser(user)
+        ?: throw ApiError(ErrorMessage.notFound)
 
     fun create(user: User): Basket {
         val basket = Basket(user = user)
@@ -33,5 +37,10 @@ class BasketService(
             it.orders.remove(order)
             repository.save(it)
         }
+    }
+
+    fun deleteWithUser(user: User) {
+        val basket: Basket = getByUser(user)
+        repository.delete(basket)
     }
 }

@@ -3,7 +3,7 @@ package loshica.api.hotel.services
 import loshica.api.hotel.core.BaseService
 import loshica.api.hotel.models.*
 import loshica.api.hotel.repositories.OrderRepository
-import loshica.api.hotel.shared.BaseOrderDto
+import loshica.api.hotel.responses.OrderResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -23,7 +23,7 @@ class OrderService(
         duty: Int,
         population: Int,
         date: String
-    ): BaseOrderDto {
+    ): OrderResponse {
         val order = Order(
             basket = basket,
             room = room,
@@ -33,7 +33,7 @@ class OrderService(
             date = date
         )
         repository.save(order)
-        return order.convertToBaseDto()
+        return order.convertToResponse()
     }
 
     fun deleteWithBasket(basket: Basket) {

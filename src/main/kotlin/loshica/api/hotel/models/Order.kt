@@ -2,7 +2,7 @@ package loshica.api.hotel.models
 
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonProperty
-import loshica.api.hotel.shared.BaseOrderDto
+import loshica.api.hotel.responses.OrderResponse
 import loshica.api.hotel.shared.Constants
 import loshica.api.hotel.shared.FieldName
 import java.util.*
@@ -36,9 +36,9 @@ class Order(
     @JsonGetter(FieldName.id)
     fun convertId(): String = this.id.toString()
 
-    fun convertToBaseDto(): BaseOrderDto = BaseOrderDto(
+    fun convertToResponse(): OrderResponse = OrderResponse(
         _basket = this.convertBasket(),
-        _room = this.room.convertToBaseDto(),
+        _room = this.room.convertToResponse(),
         _services = this.services,
         duty = this.duty,
         population = this.population,

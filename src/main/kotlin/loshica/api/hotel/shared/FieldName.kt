@@ -13,4 +13,6 @@ object FieldName {
     const val basket = "_basket"
 
     const val isFree = "isFree"
+    const val email = "email"
+    const val role = "role"
 }

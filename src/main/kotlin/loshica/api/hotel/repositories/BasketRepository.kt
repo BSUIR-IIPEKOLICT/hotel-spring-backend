@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface BasketRepository : CrudRepository<Basket, Int> {
-    fun findByUser(user: User): Iterable<Basket>
+    fun findBasketByUser(user: User): Basket?
 }

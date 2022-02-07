@@ -2,10 +2,12 @@ package loshica.api.hotel.shared
 
 object Constants {
     const val frontendUri = "http://localhost:3000"
-    const val defaultRole = "client"
-    const val adminRole = "admin"
-    const val notFoundMessage = "not found"
     const val roomLimit = 20
     const val orderEntity = "order_e"
     const val userEntity = "user_e"
+    const val bcryptStrength: Int = 5
+    const val threeHoursMillis: Int = 108000000
+    const val jwtSecret = "abcdefghijklmnopqrstuvwxyz"
+    const val minEmailChunks: Int = 3
+    const val minPasswordLength: Int = 5
 }

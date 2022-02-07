@@ -2,8 +2,8 @@ package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.OrderDto
 import loshica.api.hotel.models.*
+import loshica.api.hotel.responses.OrderResponse
 import loshica.api.hotel.services.*
-import loshica.api.hotel.shared.BaseOrderDto
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
 
@@ -24,7 +24,7 @@ class OrderController(
 
     @PostMapping
     @ResponseBody
-    fun create(@RequestBody dto: OrderDto): BaseOrderDto {
+    fun create(@RequestBody dto: OrderDto): OrderResponse {
         val basket: Basket = basketService.getOne(dto._basket.toInt())
         val room: Room = roomService.getOne(dto._room.toInt())
         val services: Iterable<Service> = serviceService.getByIds(dto._services)

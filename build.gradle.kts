@@ -22,6 +22,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.springframework:spring-web:5.3.15")
     implementation("org.springframework.boot:spring-boot-starter-web:2.6.3")
+    implementation("com.ToxicBakery.library.bcrypt:bcrypt:1.0.9")
+    implementation("org.springframework.security:spring-security-crypto:5.5.1")
+    implementation("io.jsonwebtoken:jjwt:0.9.1")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
