@@ -3,20 +3,22 @@ package loshica.api.hotel.controllers
 import loshica.api.hotel.dtos.RoomDto
 import loshica.api.hotel.models.*
 import loshica.api.hotel.responses.RoomsWithAmountResponse
-import loshica.api.hotel.services.*
+import loshica.api.hotel.interfaces.*
+import loshica.api.hotel.security.Auth
 import loshica.api.hotel.shared.Constants
+import loshica.api.hotel.shared.Role
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.room)
 class RoomController(
-    private val roomService: RoomService,
-    private val buildingService: BuildingService,
-    private val typeService: TypeService,
-    private val reviewService: ReviewService,
-    private val orderService: OrderService,
-    private val basketService: BasketService
+    private val roomService: IRoomService,
+    private val buildingService: IBuildingService,
+    private val typeService: ITypeService,
+    private val reviewService: IReviewService,
+    private val orderService: IOrderService,
+    private val basketService: IBasketService
 ) {
 
     @GetMapping
@@ -49,7 +51,12 @@ class RoomController(
 
     @PostMapping
     @ResponseBody
-    fun create(@RequestBody dto: RoomDto): Room {
+    fun create(
+        @RequestBody dto: RoomDto,
+        @RequestHeader authorization: String?
+    ): Room {
+        Auth.checkRoles(authorization, Role.adminOnly)
+
         val building: Building = buildingService.getOne(dto._building.toInt())
         val type: Type = typeService.getOne(dto._type.toInt())
         val room: Room = roomService.create(building = building, type = type)
@@ -60,7 +67,12 @@ class RoomController(
 
     @PatchMapping
     @ResponseBody
-    fun change(@RequestBody dto: RoomDto): Room {
+    fun change(
+        @RequestBody dto: RoomDto,
+        @RequestHeader authorization: String?
+    ): Room {
+        Auth.checkRoles(authorization, Role.adminOnly)
+
         val building: Building = buildingService.getOne(dto._building.toInt())
         val type: Type = typeService.getOne(dto._type.toInt())
         var room: Room = roomService.getOne(dto._id.toInt())
@@ -77,7 +89,12 @@ class RoomController(
     }
 
     @DeleteMapping
-    fun delete(@RequestBody dto: RoomDto): String {
+    fun delete(
+        @RequestBody dto: RoomDto,
+        @RequestHeader authorization: String?
+    ): String {
+        Auth.checkRoles(authorization, Role.adminOnly)
+
         val room: Room = roomService.getOne(dto._id.toInt())
         buildingService.removeRoom(room)
         reviewService.deleteWithRoom(room)

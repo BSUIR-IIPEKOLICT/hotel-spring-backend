@@ -1,6 +1,7 @@
 package loshica.api.hotel.services
 
 import loshica.api.hotel.core.BaseService
+import loshica.api.hotel.interfaces.IRoomService
 import loshica.api.hotel.models.*
 import loshica.api.hotel.repositories.RoomRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service
 @Service
 class RoomService(
     @Autowired override val repository: RoomRepository
-) : BaseService<Room, RoomRepository>(repository) {
+) : BaseService<Room, RoomRepository>(repository), IRoomService {
 
     private fun getByQuery(
         buildingId: String?,
@@ -18,33 +19,27 @@ class RoomService(
     ): Iterable<Room> {
         var rooms: Iterable<Room> = repository.findAll()
 
-        if (buildingId != null) {
-            rooms = rooms.filter {
-                room: Room -> room.building.id == buildingId.toInt()
-            }
+        buildingId?.let {
+            rooms = rooms.filter { room -> room.building.id == it.toInt() }
         }
 
-        if (typeId != null) {
-            rooms = rooms.filter {
-                room: Room -> room.type.id == typeId.toInt()
-            }
+        typeId?.let {
+            rooms = rooms.filter { room -> room.type.id == it.toInt() }
         }
 
-        if (isFree != null) {
-            rooms = rooms.filter {
-                room: Room -> room.isFree == isFree
-            }
+        isFree?.let {
+            rooms = rooms.filter { room -> room.isFree == it }
         }
 
         return rooms
     }
 
-    fun get(
+    override fun get(
         buildingId: String?,
         typeId: String?,
         isFree: Boolean?,
-        limit: Int = Int.MAX_VALUE,
-        offset: Int = 0
+        limit: Int,
+        offset: Int
     ): Iterable<Room> {
         val rooms: Iterable<Room> = getByQuery(buildingId, typeId, isFree)
 
@@ -56,37 +51,41 @@ class RoomService(
             .map { indexedValue: IndexedValue<Room> -> indexedValue.value }
     }
 
-    fun getAmount(
+    override fun getAmount(
         buildingId: String?,
         typeId: String?,
         isFree: Boolean?
     ): Int = getByQuery(buildingId, typeId, isFree).count()
 
-    fun getByBuilding(building: Building): Iterable<Room> = repository
+    override fun getByBuilding(building: Building): Iterable<Room> = repository
         .findByBuilding(building)
 
-    fun create(building: Building, type: Type): Room {
+    override fun getByType(type: Type): Iterable<Room> = repository.findByType(type)
+
+    override fun create(building: Building, type: Type): Room {
         val room = Room(building = building, type = type)
         repository.save(room)
         return room
     }
 
-    fun change(id: Int, building: Building, type: Type): Room {
-        val room: Room = this.getOne(id)
+    override fun change(id: Int, building: Building, type: Type): Room {
+        val room: Room = getOne(id)
         room.change(building = building, type = type)
         repository.save(room)
         return room
     }
 
-    fun bookRoom(id: Int, order: Order, population: Int) {
-        val room: Room = this.getOne(id)
-        room.book(order = order, population = population)
-        repository.save(room)
+    override fun bookRoom(order: Order) {
+        order.room.let {
+            it.book(order = order, population = order.population)
+            repository.save(it)
+        }
     }
 
-    fun unBookRoom(id: Int) {
-        val room: Room = this.getOne(id)
-        room.unBook()
-        repository.save(room)
+    override fun unBookRoom(id: Int) {
+        getOne(id).let {
+            it.unBook()
+            repository.save(it)
+        }
     }
 }

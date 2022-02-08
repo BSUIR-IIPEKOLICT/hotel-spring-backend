@@ -2,7 +2,7 @@ package loshica.api.hotel.models
 
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonProperty
-import loshica.api.hotel.shared.Bcrypt
+import loshica.api.hotel.security.Bcrypt
 import loshica.api.hotel.shared.Constants
 import loshica.api.hotel.shared.FieldName
 import loshica.api.hotel.shared.Role

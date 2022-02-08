@@ -5,4 +5,4 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ServiceRepository : CrudRepository<Service, Int> {}
+interface ServiceRepository : CrudRepository<Service, Int>

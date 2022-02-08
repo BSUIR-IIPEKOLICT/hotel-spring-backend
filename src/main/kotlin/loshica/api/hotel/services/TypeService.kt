@@ -1,6 +1,7 @@
 package loshica.api.hotel.services
 
 import loshica.api.hotel.core.BaseService
+import loshica.api.hotel.interfaces.ITypeService
 import loshica.api.hotel.models.Type
 import loshica.api.hotel.repositories.TypeRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,9 +10,9 @@ import org.springframework.stereotype.Service
 @Service
 class TypeService(
     @Autowired override val repository: TypeRepository
-) : BaseService<Type, TypeRepository>(repository) {
+) : BaseService<Type, TypeRepository>(repository), ITypeService {
 
-    fun create(
+    override fun create(
         name: String,
         places: Int,
         services: MutableList<loshica.api.hotel.models.Service>
@@ -25,7 +26,7 @@ class TypeService(
         return type
     }
 
-    fun change(
+    override fun change(
         id: Int,
         name: String,
         places: Int,
@@ -36,4 +37,8 @@ class TypeService(
         repository.save(type)
         return type
     }
+
+    override fun removeService(
+        service: loshica.api.hotel.models.Service
+    ) = getAll().forEach { it.services.remove(service) }
 }

@@ -1,4 +1,6 @@
-package loshica.api.hotel.shared
+package loshica.api.hotel.security
+
+import loshica.api.hotel.shared.Role
 
 data class UserData (
     val _id: String = "",

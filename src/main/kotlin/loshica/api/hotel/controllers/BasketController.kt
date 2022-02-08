@@ -2,19 +2,19 @@ package loshica.api.hotel.controllers
 
 import loshica.api.hotel.errors.ApiError
 import loshica.api.hotel.errors.ErrorMessage
+import loshica.api.hotel.interfaces.IBasketService
+import loshica.api.hotel.interfaces.IUserService
 import loshica.api.hotel.models.Basket
 import loshica.api.hotel.models.User
-import loshica.api.hotel.services.BasketService
-import loshica.api.hotel.services.UserService
-import loshica.api.hotel.shared.Auth
+import loshica.api.hotel.security.Auth
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.basket)
 class BasketController(
-    private val basketService: BasketService,
-    private val userService: UserService
+    private val basketService: IBasketService,
+    private val userService: IUserService
 ) {
 
     @GetMapping

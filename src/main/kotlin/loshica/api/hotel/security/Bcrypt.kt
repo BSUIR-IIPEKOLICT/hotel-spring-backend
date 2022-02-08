@@ -1,5 +1,6 @@
-package loshica.api.hotel.shared
+package loshica.api.hotel.security
 
+import loshica.api.hotel.shared.Constants
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 object Bcrypt {

@@ -1,12 +1,18 @@
-package loshica.api.hotel.shared
+package loshica.api.hotel.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import loshica.api.hotel.models.User
+import loshica.api.hotel.shared.Constants
+import loshica.api.hotel.shared.FieldName
 import java.util.*
 
 object Jwt {
+    private fun getExpiration(): Date = Date(
+        System.currentTimeMillis() + Constants.threeHoursMillis
+    )
+
     fun generateToken(user: User): String = Jwts.builder()
         .setClaims(mapOf(
             FieldName.id to user.id.toString(),
@@ -14,7 +20,7 @@ object Jwt {
             FieldName.role to user.role
         ))
         .signWith(SignatureAlgorithm.HS512, Constants.jwtSecret)
-        .setExpiration(Date(System.currentTimeMillis() + Constants.threeHoursMillis))
+        .setExpiration(getExpiration())
         .compact()
 
     fun decode(token: String): UserData {

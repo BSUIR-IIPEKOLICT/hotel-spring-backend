@@ -2,18 +2,18 @@ package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.BuildingDto
 import loshica.api.hotel.models.Building
-import loshica.api.hotel.services.*
+import loshica.api.hotel.interfaces.*
 import loshica.api.hotel.shared.Route
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.building)
 class BuildingController(
-    private val buildingService: BuildingService,
-    private val basketService: BasketService,
-    private val orderService: OrderService,
-    private val roomService: RoomService,
-    private val reviewService: ReviewService
+    private val buildingService: IBuildingService,
+    private val basketService: IBasketService,
+    private val orderService: IOrderService,
+    private val roomService: IRoomService,
+    private val reviewService: IReviewService
 ) {
 
     @GetMapping

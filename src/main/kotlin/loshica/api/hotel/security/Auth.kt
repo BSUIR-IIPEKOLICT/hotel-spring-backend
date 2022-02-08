@@ -1,7 +1,8 @@
-package loshica.api.hotel.shared
+package loshica.api.hotel.security
 
 import loshica.api.hotel.errors.ApiError
 import loshica.api.hotel.errors.ErrorMessage
+import loshica.api.hotel.shared.Role
 
 object Auth {
     fun getData(authorizationField: String?): UserData {

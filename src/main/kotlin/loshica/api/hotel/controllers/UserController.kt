@@ -3,22 +3,28 @@ package loshica.api.hotel.controllers
 import loshica.api.hotel.dtos.UserDto
 import loshica.api.hotel.errors.ApiError
 import loshica.api.hotel.errors.ErrorMessage
+import loshica.api.hotel.interfaces.IBasketService
+import loshica.api.hotel.interfaces.IOrderService
+import loshica.api.hotel.interfaces.IRoomService
+import loshica.api.hotel.interfaces.IUserService
 import loshica.api.hotel.models.Basket
 import loshica.api.hotel.models.Order
-import loshica.api.hotel.shared.UserData
+import loshica.api.hotel.security.UserData
 import loshica.api.hotel.models.User
 import loshica.api.hotel.responses.UserResponse
-import loshica.api.hotel.services.*
+import loshica.api.hotel.security.Auth
+import loshica.api.hotel.security.Bcrypt
+import loshica.api.hotel.security.Jwt
 import loshica.api.hotel.shared.*
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.user)
 class UserController(
-    private val userService: UserService,
-    private val basketService: BasketService,
-    private val orderService: OrderService,
-    private val roomService: RoomService
+    private val userService: IUserService,
+    private val basketService: IBasketService,
+    private val orderService: IOrderService,
+    private val roomService: IRoomService
 ) {
 
     @GetMapping
@@ -28,7 +34,6 @@ class UserController(
     }
 
     @PostMapping(Route.register)
-    @ResponseBody
     fun register(@RequestBody dto: UserDto): UserResponse {
         if (dto.email.isBlank() || dto.password.isBlank()) {
             throw ApiError(ErrorMessage.badRequest)
@@ -44,7 +49,9 @@ class UserController(
         }
 
         val candidate: User? = userService.getByEmail(dto.email)
+
         candidate?.let { throw ApiError(ErrorMessage.userExists) }
+
         val usersAmount: Int = userService.countAmount()
         val hashedPassword: String = Bcrypt.hashPassword(dto.password)
 
@@ -62,7 +69,6 @@ class UserController(
     }
 
     @PostMapping(Route.login)
-    @ResponseBody
     fun login(@RequestBody dto: UserDto): UserResponse {
         val user: User = userService
             .getByEmail(dto.email)
@@ -79,7 +85,6 @@ class UserController(
     }
 
     @PostMapping(Route.auth)
-    @ResponseBody
     fun auth(@RequestHeader authorization: String?): UserResponse {
         val userData: UserData = Auth.getData(authorization)
 

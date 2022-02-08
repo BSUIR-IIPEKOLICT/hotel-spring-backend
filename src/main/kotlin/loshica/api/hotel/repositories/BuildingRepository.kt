@@ -5,4 +5,4 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BuildingRepository : CrudRepository<Building, Int> {}
+interface BuildingRepository : CrudRepository<Building, Int>
