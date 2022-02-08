@@ -11,4 +11,6 @@ object Constants {
     const val jwtSecret = "abcdefghijklmnopqrstuvwxyz"
     const val minEmailChunks: Int = 3
     const val minPasswordLength: Int = 5
+    const val tokenTypeKey = "typ"
+    const val tokenTypeValue = "JWT"
 }

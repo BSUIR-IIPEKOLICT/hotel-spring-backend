@@ -19,7 +19,8 @@ object Jwt {
             FieldName.email to user.email,
             FieldName.role to user.role
         ))
-        .signWith(SignatureAlgorithm.HS512, Constants.jwtSecret)
+        .signWith(SignatureAlgorithm.HS256, Constants.jwtSecret)
+        .setHeaderParam(Constants.tokenTypeKey, Constants.tokenTypeValue)
         .setExpiration(getExpiration())
         .compact()
 
