@@ -6,15 +6,19 @@ interface ITypeService : IBaseService<Type> {
     fun create(
         name: String,
         places: Int,
-        services: MutableList<Service>
+        price: Int,
+        options: List<Option>
     ): Type
 
     fun change(
         id: Int,
         name: String,
         places: Int,
-        services: MutableList<Service>
+        price: Int,
+        options: List<Option>
     ): Type
 
-    fun removeService(service: Service)
+    fun removeOption(option: Option)
+    fun addRoom(room: Room)
+    fun removeRoom(room: Room)
 }

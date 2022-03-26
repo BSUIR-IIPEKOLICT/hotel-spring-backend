@@ -13,18 +13,18 @@ class RoomService(
 ) : BaseService<Room, RoomRepository>(repository), IRoomService {
 
     private fun getByQuery(
-        buildingId: String?,
-        typeId: String?,
+        buildingId: Int?,
+        typeId: Int?,
         isFree: Boolean?
     ): Iterable<Room> {
         var rooms: Iterable<Room> = repository.findAll()
 
         buildingId?.let {
-            rooms = rooms.filter { room -> room.building.id == it.toInt() }
+            rooms = rooms.filter { room -> room.building.id == it }
         }
 
         typeId?.let {
-            rooms = rooms.filter { room -> room.type.id == it.toInt() }
+            rooms = rooms.filter { room -> room.type.id == it }
         }
 
         isFree?.let {
@@ -35,8 +35,8 @@ class RoomService(
     }
 
     override fun get(
-        buildingId: String?,
-        typeId: String?,
+        buildingId: Int?,
+        typeId: Int?,
         isFree: Boolean?,
         limit: Int,
         offset: Int
@@ -51,16 +51,9 @@ class RoomService(
             .map { indexedValue: IndexedValue<Room> -> indexedValue.value }
     }
 
-    override fun getAmount(
-        buildingId: String?,
-        typeId: String?,
-        isFree: Boolean?
-    ): Int = getByQuery(buildingId, typeId, isFree).count()
-
-    override fun getByBuilding(building: Building): Iterable<Room> = repository
-        .findByBuilding(building)
-
-    override fun getByType(type: Type): Iterable<Room> = repository.findByType(type)
+    override fun getAmount(buildingId: Int?, typeId: Int?, isFree: Boolean?): Int {
+        return getByQuery(buildingId, typeId, isFree).count()
+    }
 
     override fun create(building: Building, type: Type): Room {
         val room = Room(building = building, type = type)
@@ -75,16 +68,30 @@ class RoomService(
         return room
     }
 
-    override fun bookRoom(order: Order) {
-        order.room.let {
-            it.book(order = order, population = order.population)
+    override fun bookRoom(booking: Booking) {
+        booking.room.let {
+            it.book(booking)
             repository.save(it)
         }
     }
 
-    override fun unBookRoom(id: Int) {
-        getOne(id).let {
-            it.unBook()
+    override fun unBookRoom(booking: Booking) {
+        booking.room.let {
+            it.unBook(booking)
+            repository.save(it)
+        }
+    }
+
+    override fun addComment(comment: Comment) {
+        comment.room.let {
+            it.comments.add(comment)
+            repository.save(it)
+        }
+    }
+
+    override fun removeComment(comment: Comment) {
+        comment.room.let {
+            it.comments.remove(comment)
             repository.save(it)
         }
     }

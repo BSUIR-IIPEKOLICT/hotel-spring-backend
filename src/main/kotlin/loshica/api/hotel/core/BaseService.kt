@@ -1,7 +1,6 @@
 package loshica.api.hotel.core
 
-import loshica.api.hotel.errors.ApiError
-import loshica.api.hotel.errors.ErrorMessage
+import loshica.api.hotel.errors.EntityNotFoundError
 import loshica.api.hotel.interfaces.IBaseService
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -12,12 +11,19 @@ open class BaseService<M, R : CrudRepository<M, Int>>(
 
     override fun getAll(): Iterable<M> = repository.findAll()
 
-    override fun getOne(id: Int): M = repository
-        .findByIdOrNull(id)
-        ?: throw ApiError(ErrorMessage.notFound)
+    override fun getOne(id: Int): M {
+        val className: String = this.javaClass.name.split(".").last()
+
+        return repository
+            .findByIdOrNull(id)
+            ?: throw EntityNotFoundError(
+                entityName = className.replace("Service", ""),
+                id = id
+            )
+    }
 
     override fun delete(id: Int): Int {
-        repository.deleteById(id)
+        getOne(id)?.let { repository.delete(it) }
         return id
     }
 }

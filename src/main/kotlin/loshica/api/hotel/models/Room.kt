@@ -1,59 +1,77 @@
 package loshica.api.hotel.models
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonProperty
-import loshica.api.hotel.responses.RoomResponse
-import loshica.api.hotel.shared.FieldName
+import loshica.api.hotel.core.BaseEntity
+import loshica.api.hotel.dtos.RoomDto
+import loshica.api.hotel.dtos.RoomPopulatedDto
+import org.hibernate.annotations.LazyCollection
+import org.hibernate.annotations.LazyCollectionOption
+import java.util.*
 import javax.persistence.*
 
 @Entity
 class Room(
-    @ManyToOne @field:JsonProperty(FieldName.building) var building: Building,
-    @ManyToOne @field:JsonProperty(FieldName.type) var type: Type,
-    @OneToOne @field:JsonProperty(FieldName.order) var orderField: Order? = null,
-    @field:JsonProperty(FieldName.isFree) var isFree: Boolean = true,
+    @ManyToOne var building: Building,
+    @ManyToOne var type: Type,
+
+    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @Column(name = "roomBookings")
+    val bookings: MutableList<Booking> = mutableListOf(),
+
+    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @Column(name = "roomComments")
+    val comments: MutableList<Comment> = mutableListOf(),
+
+    var isFree: Boolean = true,
     var population: Int = 0,
+    var bookedUntil: Date? = null,
 
-//    @OneToMany var reviews: MutableList<Review> = mutableListOf(),
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @field:JsonProperty(FieldName.id)
-    val id: Int = 0
-) {
-
-    @JsonGetter(FieldName.order)
-    fun convertOrder(): String? = this.orderField?.id?.toString()
-
-    @JsonGetter(FieldName.isFree)
-    fun convertIsFree(): Boolean = this.isFree
-
-    @JsonGetter(FieldName.id)
-    fun convertId(): String = this.id.toString()
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int = 0
+) : BaseEntity<RoomDto, RoomPopulatedDto>() {
 
     fun change(building: Building, type: Type) {
         this.building = building
         this.type = type
     }
 
-    fun book(order: Order, population: Int) {
+    fun book(booking: Booking) {
         this.isFree = false
-        this.orderField = order
-        this.population = population
+        this.population = booking.population
+        this.bookings.add(booking)
+        booking.endDate?.let { this.bookedUntil = it }
     }
 
-    fun unBook() {
+    fun unBook(booking: Booking) {
         this.isFree = true
-        this.orderField = null
         this.population = 0
+        this.bookings.remove(booking)
+        this.bookedUntil = null
     }
 
-    fun convertToResponse(): RoomResponse = RoomResponse(
-        _building = this.building.id.toString(),
-        _type = this.type.id.toString(),
-        _order = this.convertOrder(),
-        isFree = this.convertIsFree(),
-        population = this.population,
-        _id = this.convertId()
-    )
+    override fun toDto(): RoomDto {
+        return RoomDto(
+            id = this.id,
+            building = this.building.id,
+            type = this.type.id,
+            bookings = this.bookings.map { it.id },
+            comments = this.comments.map { it.id },
+            isFree = this.isFree,
+            population = this.population,
+            bookedUntil = this.bookedUntil
+        )
+    }
+
+    override fun toPopulatedDto(): RoomPopulatedDto {
+        return RoomPopulatedDto(
+            id = this.id,
+            building = this.building.toDto(),
+            type = this.type.toDto(),
+            bookings = this.bookings.map { it.toDto() },
+            comments = this.comments.map { it.toDto() },
+            isFree = this.isFree,
+            population = this.population,
+            bookedUntil = this.bookedUntil
+        )
+    }
 }

@@ -21,7 +21,7 @@ class BuildingService(
 
     override fun change(id: Int, address: String): Building {
         val building: Building = getOne(id)
-        building.change(address = address)
+        building.address = address
         repository.save(building)
         return building
     }

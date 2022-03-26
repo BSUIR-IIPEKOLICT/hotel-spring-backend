@@ -1,34 +1,66 @@
 package loshica.api.hotel.models
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonProperty
-import loshica.api.hotel.security.Bcrypt
-import loshica.api.hotel.shared.Constants
-import loshica.api.hotel.shared.FieldName
+import loshica.api.hotel.core.BaseEntity
+import loshica.api.hotel.dtos.UserDto
+import loshica.api.hotel.dtos.UserPopulatedDto
+import loshica.api.hotel.shared.Configuration
 import loshica.api.hotel.shared.Role
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import javax.persistence.*
 
-@Entity(name = Constants.userEntity)
+@Entity(name = "app_user")
 class User(
-    @Column(unique = true) val email: String = "",
-    val password: String = "",
-    var role: String = Role.client,
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.EAGER)
+    @Column(name = "userBookings")
+    val bookings: MutableList<Booking> = mutableListOf(),
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @field:JsonProperty(FieldName.id)
-    val id: Int = 0
-) {
+    @Column(unique = true) var email: String = "",
+    var password: String = "",
+    var role: String = Role.CLIENT,
+    var isActive: Boolean = true,
 
-    @JsonGetter(FieldName.id)
-    fun convertId(): String = this.id.toString()
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int = 0
+) : BaseEntity<UserDto, UserPopulatedDto>() {
 
-    fun change(role: String) {
+    fun hashPassword(password: String) {
+        this.password = bcInstance.encode(password)
+    }
+
+    fun change(email: String, password: String, role: String) {
+        this.email = email
+        hashPassword(password)
         this.role = role
     }
 
-    fun comparePasswords(password: String): Boolean = Bcrypt.comparePasswords(
-        password = password,
-        correct = this.password
-    )
+    fun setIsActive(value: Boolean) {
+        this.isActive = value
+    }
+
+    fun comparePasswords(password: String): Boolean = bcInstance.matches(password, this.password)
+
+    companion object {
+        private val bcInstance = BCryptPasswordEncoder(Configuration.BCRYPT_STRENGTH)
+    }
+
+    override fun toDto(): UserDto {
+        return UserDto(
+            bookings = this.bookings.map { it.id },
+            email = this.email,
+            password = this.password,
+            role = this.role,
+            isActive = this.isActive,
+            id = this.id
+        )
+    }
+
+    override fun toPopulatedDto(): UserPopulatedDto {
+        return UserPopulatedDto(
+            bookings = this.bookings.map { it.toDto() },
+            email = this.email,
+            password = this.password,
+            role = this.role,
+            isActive = this.isActive,
+            id = this.id,
+        )
+    }
 }

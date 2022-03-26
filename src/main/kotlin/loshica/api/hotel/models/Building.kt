@@ -1,33 +1,34 @@
 package loshica.api.hotel.models
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonProperty
-import loshica.api.hotel.shared.FieldName
+import loshica.api.hotel.core.BaseEntity
+import loshica.api.hotel.dtos.BuildingDto
+import loshica.api.hotel.dtos.BuildingPopulatedDto
 import javax.persistence.*
 
 @Entity
 class Building(
+    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
+    @Column(name = "buildingRooms")
+    val rooms: MutableList<Room> = mutableListOf(),
+
     @Column(unique = true) var address: String = "",
 
-    @OneToMany
-    @field:JsonProperty(FieldName.rooms)
-    var rooms: MutableList<Room> = mutableListOf(),
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int = 0
+) : BaseEntity<BuildingDto, BuildingPopulatedDto>() {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @field:JsonProperty(FieldName.id)
-    val id: Int = 0
-) {
-
-    @JsonGetter(FieldName.rooms)
-    fun convertRooms(): List<String> = this.rooms.map {
-        room: Room -> "${room.id}"
+    override fun toDto(): BuildingDto {
+        return BuildingDto(
+            rooms = this.rooms.map { it.id },
+            address = this.address,
+            id = this.id
+        )
     }
 
-    @JsonGetter(FieldName.id)
-    fun convertId(): String = this.id.toString()
-
-    fun change(address: String) {
-        this.address = address
+    override fun toPopulatedDto(): BuildingPopulatedDto {
+        return BuildingPopulatedDto(
+            rooms = this.rooms.map { it.toDto() },
+            address = this.address,
+            id = this.id
+        )
     }
 }

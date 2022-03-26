@@ -3,52 +3,48 @@ package loshica.api.hotel.controllers
 import loshica.api.hotel.dtos.BuildingDto
 import loshica.api.hotel.models.Building
 import loshica.api.hotel.interfaces.*
+import loshica.api.hotel.annotations.Auth
+import loshica.api.hotel.dtos.DeleteDto
+import loshica.api.hotel.models.User
+import loshica.api.hotel.shared.Role
 import loshica.api.hotel.shared.Route
+import loshica.api.hotel.shared.Selector
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(Route.building)
-class BuildingController(
-    private val buildingService: IBuildingService,
-    private val basketService: IBasketService,
-    private val orderService: IOrderService,
-    private val roomService: IRoomService,
-    private val reviewService: IReviewService
-) {
+@RequestMapping(Route.BUILDINGS)
+class BuildingController(private val buildingService: IBuildingService) {
 
     @GetMapping
-    fun getAll(): Iterable<Building> = buildingService.getAll()
+    fun getAll(): List<BuildingDto> = buildingService.getAll().map { it.toDto() }
+
+    @GetMapping(Selector.ID)
+    fun getOne(@PathVariable id: Int): BuildingDto = buildingService.getOne(id).toDto()
 
     @PostMapping
-    @ResponseBody
-    fun create(@RequestBody dto: BuildingDto): Building = buildingService.create(
-        address = dto.address
-    )
+    fun create(
+        @Auth(Role.ADMIN) user: User,
+        @RequestBody dto: BuildingDto
+    ): BuildingDto {
+        return buildingService.create(address = dto.address).toDto()
+    }
 
-    @PatchMapping
-    @ResponseBody
-    fun change(@RequestBody dto: BuildingDto): Building = buildingService.change(
-        id = dto._id.toInt(),
-        address = dto.address
-    )
+    @PutMapping(Selector.ID)
+    fun change(
+        @Auth(Role.ADMIN) user: User,
+        @RequestBody dto: BuildingDto,
+        @PathVariable id: Int
+    ): BuildingDto {
+        return buildingService.change(id = id, address = dto.address).toDto()
+    }
 
-    @DeleteMapping
-    fun delete(@RequestBody dto: BuildingDto): String {
-        val building: Building = buildingService.getOne(dto._id.toInt())
-
-        roomService.getByBuilding(building).forEach {
-            it.orderField?.let { order ->
-                basketService.removeOrder(order)
-                orderService.delete(order.id)
-            }
-
-            reviewService.deleteWithRoom(it)
-            buildingService.removeRoom(it)
-            roomService.delete(it.id)
-        }
-
-        return buildingService
-            .delete(id = dto._id.toInt())
-            .toString()
+    @DeleteMapping(Selector.ID)
+    fun delete(
+        @Auth(Role.ADMIN) user: User,
+        @PathVariable id: Int
+    ): DeleteDto {
+        val building: Building = buildingService.getOne(id)
+        building.rooms.forEach { MainController.deleteRoom(it) }
+        return DeleteDto(id = buildingService.delete(id))
     }
 }

@@ -1,14 +1,14 @@
 package loshica.api.hotel.errors
 
 object ErrorMessage {
-    const val notFound = "not found"
-    const val badRequest = "bad request"
-    const val unknownError = "unknown error"
-    const val invalidEmail = "invalid email"
-    const val invalidPassword = "invalid password"
-    const val shortPassword = "bad password, use at least 5 any symbols"
-    const val userExists = "user already exists"
-    const val noUser = "no user with this email"
-    const val unauthorized = "unauthorized"
-    const val noAccess = "no access"
+    const val NOT_FOUND = "not found"
+    const val BAD_REQUEST = "bad request"
+    const val UNKNOWN_ERROR = "unknown error"
+    const val INVALID_EMAIL = "invalid email"
+    const val INVALID_PASSWORD = "invalid password"
+    const val BAD_PASSWORD = "bad password, use at least 5 any symbols"
+    const val USER_ALREADY_EXISTS = "user already exists"
+    const val NO_USER_WITH_THIS_EMAIL = "no user with this email"
+    const val UNAUTHORIZED = "unauthorized"
+    const val NO_ACCESS = "no access"
 }

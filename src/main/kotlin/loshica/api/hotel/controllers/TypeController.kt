@@ -1,81 +1,64 @@
 package loshica.api.hotel.controllers
 
+import loshica.api.hotel.annotations.Auth
+import loshica.api.hotel.dtos.DeleteDto
 import loshica.api.hotel.dtos.TypeDto
 import loshica.api.hotel.models.Type
 import loshica.api.hotel.interfaces.*
-import loshica.api.hotel.security.Auth
+import loshica.api.hotel.models.User
 import loshica.api.hotel.shared.Role
 import loshica.api.hotel.shared.Route
+import loshica.api.hotel.shared.Selector
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(Route.type)
+@RequestMapping(Route.TYPES)
 class TypeController(
     private val typeService: ITypeService,
-    private val serviceService: IServiceService,
-    private val roomService: IRoomService,
-    private val reviewService: IReviewService,
-    private val buildingService: IBuildingService,
-    private val basketService: IBasketService,
-    private val orderService: IOrderService
+    private val optionService: IOptionService
 ) {
 
     @GetMapping
-    fun getAll(): Iterable<Type> = typeService.getAll()
+    fun getAll(): List<TypeDto> = typeService.getAll().map { it.toDto() }
+
+    @GetMapping(Selector.ID)
+    fun getOne(@PathVariable id: Int): TypeDto = typeService.getOne(id).toDto()
 
     @PostMapping
-    @ResponseBody
     fun create(
-        @RequestBody dto: TypeDto,
-        @RequestHeader authorization: String?
-    ): Type {
-        Auth.checkRoles(authorization, Role.adminOnly)
-
+        @Auth(Role.ADMIN) user: User,
+        @RequestBody dto: TypeDto
+    ): TypeDto {
         return typeService.create(
             name = dto.name,
             places = dto.places,
-            services = serviceService.getByIds(dto._services).toMutableList()
-        )
+            price = dto.price,
+            options = optionService.getByIds(dto.options)
+        ).toDto()
     }
 
-    @PatchMapping
-    @ResponseBody
+    @PutMapping(Selector.ID)
     fun change(
+        @Auth(Role.ADMIN) user: User,
         @RequestBody dto: TypeDto,
-        @RequestHeader authorization: String?
-    ): Type {
-        Auth.checkRoles(authorization, Role.adminOnly)
-
-        val type: Type = typeService.getOne(dto._id.toInt())
-        type.change(
+        @PathVariable id: Int
+    ): TypeDto {
+        return typeService.change(
+            id = id,
             name = dto.name,
             places = dto.places,
-            services = serviceService.getByIds(dto._services).toMutableList()
-        )
-
-        return type
+            price = dto.price,
+            options = optionService.getByIds(dto.options)
+        ).toDto()
     }
 
-    @DeleteMapping
+    @DeleteMapping(Selector.ID)
     fun delete(
-        @RequestBody dto: TypeDto,
-        @RequestHeader authorization: String?
-    ): String {
-        Auth.checkRoles(authorization, Role.adminOnly)
-
-        val type: Type = typeService.getOne(dto._id.toInt())
-        roomService.getByType(type).forEach {
-            reviewService.deleteWithRoom(it)
-            buildingService.removeRoom(it)
-
-            it.orderField?.let { order ->
-                basketService.removeOrder(order)
-                orderService.delete(order.id)
-            }
-
-            roomService.delete(it.id)
-        }
-
-        return typeService.delete(id = type.id).toString()
+        @Auth(Role.ADMIN) user: User,
+        @PathVariable id: Int
+    ): DeleteDto {
+        val type: Type = typeService.getOne(id)
+        type.rooms.forEach { MainController.deleteRoom(it) }
+        return DeleteDto(id = typeService.delete(id))
     }
 }

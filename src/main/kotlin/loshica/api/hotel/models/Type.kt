@@ -1,38 +1,55 @@
 package loshica.api.hotel.models
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonProperty
-import loshica.api.hotel.shared.FieldName
+import loshica.api.hotel.core.BaseEntity
+import loshica.api.hotel.dtos.TypeDto
+import loshica.api.hotel.dtos.TypePopulatedDto
+import org.hibernate.annotations.LazyCollection
+import org.hibernate.annotations.LazyCollectionOption
 import javax.persistence.*
 
 @Entity
 class Type(
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    var options: MutableList<Option> = mutableListOf(),
+
+    @OneToMany(mappedBy = "type", fetch = FetchType.EAGER)
+    @Column(name = "typeRooms")
+    val rooms: MutableList<Room> = mutableListOf(),
+
     @Column(unique = true) var name: String = "",
     var places: Int = 0,
+    var price: Int = 0,
 
-    @ManyToMany
-    @field:JsonProperty(FieldName.services)
-    var services: MutableList<Service> = mutableListOf(),
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int = 0
+) : BaseEntity<TypeDto, TypePopulatedDto>() {
 
-//    @OneToMany var rooms: MutableList<Room> = mutableListOf(),
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @field:JsonProperty(FieldName.id)
-    val id: Int = 0
-) {
-
-    @JsonGetter(FieldName.services)
-    fun convertServices(): List<String> = this.services.map {
-        service: Service -> "${service.id}"
-    }
-
-    @JsonGetter(FieldName.id)
-    fun convertId(): String = this.id.toString()
-
-    fun change(name: String, places: Int, services: List<Service>) {
+    fun change(name: String, places: Int, price: Int, options: List<Option>) {
         this.name = name
         this.places = places
-        this.services = services.toMutableList()
+        this.price = price
+        this.options = options.toMutableList()
+    }
+
+    override fun toDto(): TypeDto {
+        return TypeDto(
+            options = this.options.map { it.id },
+            rooms = this.rooms.map { it.id },
+            name = this.name,
+            places = this.places,
+            price = this.price,
+            id = this.id
+        )
+    }
+
+    override fun toPopulatedDto(): TypePopulatedDto {
+        return TypePopulatedDto(
+            options = this.options.map { it.toDto() },
+            rooms = this.rooms.map { it.toDto() },
+            name = this.name,
+            places = this.places,
+            price = this.price,
+            id = this.id
+        )
     }
 }

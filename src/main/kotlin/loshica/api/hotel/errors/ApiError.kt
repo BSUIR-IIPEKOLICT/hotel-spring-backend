@@ -1,5 +1,8 @@
 package loshica.api.hotel.errors
 
-class ApiError(
-    override val message: String = ErrorMessage.unknownError
-) : Exception(message)
+import org.springframework.http.HttpStatus
+
+data class ApiError(
+    val code: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+    val message: String = ErrorMessage.UNKNOWN_ERROR
+)
