@@ -37,3 +37,18 @@ Bootstrap project (needed 17 Java):
 ./gradlew build -x test
 java -jar build/libs/hotel-api-2.0.jar
 ```
+
+Add heroku remote to project:
+```shell
+heroku login
+git init
+heroku git:remote -a iipekolict-hotel-api
+```
+
+Deploy project (from main branch):
+```shell
+git add .
+git commit -m "commit message"
+git push
+git push heroku main
+```
