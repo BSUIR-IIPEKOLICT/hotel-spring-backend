@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.ROOMS)
+@CrossOrigin(originPatterns = ["*"])
 class RoomController(
     private val roomService: IRoomService,
     private val buildingService: IBuildingService,

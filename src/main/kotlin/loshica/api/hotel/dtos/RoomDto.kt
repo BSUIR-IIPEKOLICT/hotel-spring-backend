@@ -1,6 +1,6 @@
 package loshica.api.hotel.dtos
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonGetter
 import java.util.Date
 
 data class RoomDto (
@@ -8,8 +8,12 @@ data class RoomDto (
     val type: Int = 0,
     val bookings: List<Int> = emptyList(),
     val comments: List<Int> = emptyList(),
-    @JsonProperty("isFree") val isFree: Boolean = true,
+    val isFree: Boolean = true,
     val population: Int = 0,
     val bookedUntil: Date? = null,
     val id: Int = 0
-)
+) {
+
+    @JsonGetter("isFree")
+    fun parseIsFree(): Boolean = this.isFree
+}

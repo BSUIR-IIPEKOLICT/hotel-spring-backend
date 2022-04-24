@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.BUILDINGS)
+@CrossOrigin(originPatterns = ["*"])
 class BuildingController(private val buildingService: IBuildingService) {
 
     @GetMapping

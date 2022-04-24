@@ -13,16 +13,14 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.AUTH)
+@CrossOrigin(originPatterns = ["*"])
 class AuthController (private val userService: IUserService) {
 
     private fun getUserByEmail(email: String): User = userService.getByEmail(email)
         ?: throw BadRequestError(ErrorMessage.NO_USER_WITH_THIS_EMAIL)
 
     @GetMapping
-    fun auth(
-        @Auth user: User,
-        @RequestHeader authorization: String?
-    ): AuthDto {
+    fun auth(@Auth user: User): AuthDto {
         return AuthDto(token = Jwt.generateToken(user))
     }
 

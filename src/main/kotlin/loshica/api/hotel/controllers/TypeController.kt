@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.TYPES)
+@CrossOrigin(originPatterns = ["*"])
 class TypeController(
     private val typeService: ITypeService,
     private val optionService: IOptionService

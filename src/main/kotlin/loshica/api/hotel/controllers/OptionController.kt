@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.OPTIONS)
+@CrossOrigin(originPatterns = ["*"])
 class OptionController(private val optionService: IOptionService) {
 
     @GetMapping

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.COMMENTS)
+@CrossOrigin(originPatterns = ["*"])
 class CommentController(
     private val commentService: ICommentService,
     private val roomService: IRoomService

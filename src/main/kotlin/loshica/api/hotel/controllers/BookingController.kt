@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.BOOKINGS)
+@CrossOrigin(originPatterns = ["*"])
 class BookingController(
     private val bookingService: IBookingService,
     private val roomService: IRoomService,
@@ -21,7 +22,9 @@ class BookingController(
 ) {
 
     @GetMapping
-    fun get(@Auth user: User): BookingResponseDto {
+    fun get(@RequestParam userId: Int): BookingResponseDto {
+        val user: User = userService.getOne(userId)
+
         return BookingResponseDto(
             active = user.bookings.filter { it.isActive }.map { it.toPopulatedDto() },
             inActive = user.bookings.filter { !it.isActive }.map { it.toPopulatedDto() }
