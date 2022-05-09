@@ -1,5 +1,6 @@
 package loshica.api.hotel.dtos
 
+import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.Date
 
@@ -13,4 +14,8 @@ data class BookingPopulatedDto (
     @JsonProperty("endDate") val endDate: Date? = null,
     @JsonProperty("isActive") val isActive: Boolean = true,
     @JsonProperty("id") val id: Int = 0
-)
+) {
+
+    @JsonGetter("isActive")
+    fun parseIsActive(): Boolean = this.isActive
+}
