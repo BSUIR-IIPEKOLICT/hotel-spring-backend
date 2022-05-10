@@ -3,6 +3,7 @@ package loshica.api.hotel.controllers
 import loshica.api.hotel.annotations.Auth
 import loshica.api.hotel.dtos.DeleteDto
 import loshica.api.hotel.dtos.TypeDto
+import loshica.api.hotel.dtos.TypePopulatedDto
 import loshica.api.hotel.models.Type
 import loshica.api.hotel.interfaces.*
 import loshica.api.hotel.models.User
@@ -20,22 +21,22 @@ class TypeController(
 ) {
 
     @GetMapping
-    fun getAll(): List<TypeDto> = typeService.getAll().map { it.toDto() }
+    fun getAll(): List<TypePopulatedDto> = typeService.getAll().map { it.toPopulatedDto() }
 
     @GetMapping(Selector.ID)
-    fun getOne(@PathVariable id: Int): TypeDto = typeService.getOne(id).toDto()
+    fun getOne(@PathVariable id: Int): TypePopulatedDto = typeService.getOne(id).toPopulatedDto()
 
     @PostMapping
     fun create(
         @Auth(Role.ADMIN) user: User,
         @RequestBody dto: TypeDto
-    ): TypeDto {
+    ): TypePopulatedDto {
         return typeService.create(
             name = dto.name,
             places = dto.places,
             price = dto.price,
             options = optionService.getByIds(dto.options)
-        ).toDto()
+        ).toPopulatedDto()
     }
 
     @PutMapping(Selector.ID)
@@ -43,14 +44,14 @@ class TypeController(
         @Auth(Role.ADMIN) user: User,
         @RequestBody dto: TypeDto,
         @PathVariable id: Int
-    ): TypeDto {
+    ): TypePopulatedDto {
         return typeService.change(
             id = id,
             name = dto.name,
             places = dto.places,
             price = dto.price,
             options = optionService.getByIds(dto.options)
-        ).toDto()
+        ).toPopulatedDto()
     }
 
     @DeleteMapping(Selector.ID)

@@ -16,4 +16,6 @@ object Route {
 
     const val ROLE = "role"
     const val CREDENTIALS = "credentials"
+
+    const val PAGINATED = "paginated"
 }

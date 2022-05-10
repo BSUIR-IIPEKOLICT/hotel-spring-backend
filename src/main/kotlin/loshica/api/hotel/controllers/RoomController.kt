@@ -20,7 +20,10 @@ class RoomController(
 ) {
 
     @GetMapping
-    fun get(
+    fun getAll(): List<RoomPopulatedDto> = roomService.getAll().map { it.toPopulatedDto() }
+
+    @GetMapping(Route.PAGINATED)
+    fun getWithPagination(
         @RequestParam buildingId: Int?,
         @RequestParam typeId: Int?,
         @RequestParam isFree: Boolean?,
