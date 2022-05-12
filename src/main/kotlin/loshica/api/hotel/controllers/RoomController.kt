@@ -14,10 +14,24 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(Route.ROOMS)
 @CrossOrigin(originPatterns = ["*"])
 class RoomController(
-    private val roomService: IRoomService,
+    bookingService: IBookingService,
     private val buildingService: IBuildingService,
-    private val typeService: ITypeService
+    commentService: ICommentService,
+    optionService: IOptionService,
+    private val roomService: IRoomService,
+    private val typeService: ITypeService,
+    userService: IUserService
 ) {
+
+    private val destroyer = Destroyer(
+        bookingService = bookingService,
+        buildingService = buildingService,
+        commentService = commentService,
+        optionService = optionService,
+        roomService = roomService,
+        typeService = typeService,
+        userService = userService
+    )
 
     @GetMapping
     fun getAll(): List<RoomPopulatedDto> = roomService.getAll().map { it.toPopulatedDto() }
@@ -94,6 +108,6 @@ class RoomController(
         @PathVariable id: Int
     ): DeleteDto {
         val room: Room = roomService.getOne(id)
-        return DeleteDto(id = MainController.deleteRoom(room))
+        return DeleteDto(id = destroyer.deleteRoom(room))
     }
 }

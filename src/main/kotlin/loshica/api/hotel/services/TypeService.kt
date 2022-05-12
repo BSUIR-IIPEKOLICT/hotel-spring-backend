@@ -61,4 +61,9 @@ class TypeService(
             repository.save(it)
         }
     }
+
+    override fun clearOptions(type: Type) {
+        type.options = mutableListOf()
+        repository.save(type)
+    }
 }

@@ -9,12 +9,31 @@ import loshica.api.hotel.models.User
 import loshica.api.hotel.shared.Role
 import loshica.api.hotel.shared.Route
 import loshica.api.hotel.shared.Selector
+import loshica.api.hotel.shared.Destroyer
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.BUILDINGS)
 @CrossOrigin(originPatterns = ["*"])
-class BuildingController(private val buildingService: IBuildingService) {
+class BuildingController(
+    bookingService: IBookingService,
+    private val buildingService: IBuildingService,
+    commentService: ICommentService,
+    optionService: IOptionService,
+    roomService: IRoomService,
+    typeService: ITypeService,
+    userService: IUserService
+) {
+
+    private val destroyer = Destroyer(
+        bookingService = bookingService,
+        buildingService = buildingService,
+        commentService = commentService,
+        optionService = optionService,
+        roomService = roomService,
+        typeService = typeService,
+        userService = userService
+    )
 
     @GetMapping
     fun getAll(): List<BuildingDto> = buildingService.getAll().map { it.toDto() }
@@ -45,7 +64,7 @@ class BuildingController(private val buildingService: IBuildingService) {
         @PathVariable id: Int
     ): DeleteDto {
         val building: Building = buildingService.getOne(id)
-        building.rooms.forEach { MainController.deleteRoom(it) }
+        building.rooms.forEach { destroyer.deleteRoom(it) }
         return DeleteDto(id = buildingService.delete(id))
     }
 }

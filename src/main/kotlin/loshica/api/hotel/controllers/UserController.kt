@@ -1,18 +1,36 @@
 package loshica.api.hotel.controllers
 
 import loshica.api.hotel.dtos.UserDto
-import loshica.api.hotel.interfaces.IUserService
 import loshica.api.hotel.models.User
 import loshica.api.hotel.dtos.DeleteDto
 import loshica.api.hotel.shared.*
 import loshica.api.hotel.annotations.Auth
 import loshica.api.hotel.dtos.UserPopulatedDto
+import loshica.api.hotel.interfaces.*
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(Route.USERS)
 @CrossOrigin(originPatterns = ["*"])
-class UserController(private val userService: IUserService) {
+class UserController(
+    bookingService: IBookingService,
+    buildingService: IBuildingService,
+    commentService: ICommentService,
+    optionService: IOptionService,
+    roomService: IRoomService,
+    typeService: ITypeService,
+    private val userService: IUserService
+) {
+
+    private val destroyer = Destroyer(
+        bookingService = bookingService,
+        buildingService = buildingService,
+        commentService = commentService,
+        optionService = optionService,
+        roomService = roomService,
+        typeService = typeService,
+        userService = userService
+    )
 
     @GetMapping
     fun getAll(): List<UserPopulatedDto> {
@@ -64,7 +82,7 @@ class UserController(private val userService: IUserService) {
         @Auth(Role.ADMIN) user: User,
         @PathVariable id: Int
     ): DeleteDto {
-        user.bookings.forEach { MainController.deleteBooking(it) }
+        user.bookings.forEach { destroyer.deleteBooking(it) }
         return DeleteDto(id = userService.delete(id))
     }
 }

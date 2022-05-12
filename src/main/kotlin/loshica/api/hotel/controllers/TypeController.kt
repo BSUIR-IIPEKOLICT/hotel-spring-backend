@@ -7,6 +7,7 @@ import loshica.api.hotel.dtos.TypePopulatedDto
 import loshica.api.hotel.models.Type
 import loshica.api.hotel.interfaces.*
 import loshica.api.hotel.models.User
+import loshica.api.hotel.shared.Destroyer
 import loshica.api.hotel.shared.Role
 import loshica.api.hotel.shared.Route
 import loshica.api.hotel.shared.Selector
@@ -16,9 +17,24 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(Route.TYPES)
 @CrossOrigin(originPatterns = ["*"])
 class TypeController(
+    bookingService: IBookingService,
+    buildingService: IBuildingService,
+    commentService: ICommentService,
+    private val optionService: IOptionService,
+    roomService: IRoomService,
     private val typeService: ITypeService,
-    private val optionService: IOptionService
+    userService: IUserService
 ) {
+
+    private val destroyer = Destroyer(
+        bookingService = bookingService,
+        buildingService = buildingService,
+        commentService = commentService,
+        optionService = optionService,
+        roomService = roomService,
+        typeService = typeService,
+        userService = userService
+    )
 
     @GetMapping
     fun getAll(): List<TypePopulatedDto> = typeService.getAll().map { it.toPopulatedDto() }
@@ -60,7 +76,7 @@ class TypeController(
         @PathVariable id: Int
     ): DeleteDto {
         val type: Type = typeService.getOne(id)
-        type.rooms.forEach { MainController.deleteRoom(it) }
+        type.rooms.forEach { destroyer.deleteRoom(it) }
         return DeleteDto(id = typeService.delete(id))
     }
 }

@@ -9,6 +9,7 @@ import loshica.api.hotel.interfaces.*
 import loshica.api.hotel.models.*
 import loshica.api.hotel.shared.Route
 import loshica.api.hotel.shared.Selector
+import loshica.api.hotel.shared.Destroyer
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -16,10 +17,23 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin(originPatterns = ["*"])
 class BookingController(
     private val bookingService: IBookingService,
-    private val roomService: IRoomService,
+    buildingService: IBuildingService,
+    commentService: ICommentService,
     private val optionService: IOptionService,
+    private val roomService: IRoomService,
+    typeService: ITypeService,
     private val userService: IUserService
 ) {
+
+    private val destroyer = Destroyer(
+        bookingService = bookingService,
+        buildingService = buildingService,
+        commentService = commentService,
+        optionService = optionService,
+        roomService = roomService,
+        typeService = typeService,
+        userService = userService
+    )
 
     @GetMapping
     fun get(@RequestParam userId: Int): BookingResponseDto {
@@ -66,7 +80,7 @@ class BookingController(
         @PathVariable id: Int
     ): DeleteDto {
         val booking: Booking = bookingService.getOne(id)
-        MainController.disableBooking(booking)
+        destroyer.disableBooking(booking)
         return DeleteDto(id = id)
     }
 }

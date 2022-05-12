@@ -21,4 +21,5 @@ interface ITypeService : IBaseService<Type> {
     fun removeOption(option: Option)
     fun addRoom(room: Room)
     fun removeRoom(room: Room)
+    fun clearOptions(type: Type)
 }
