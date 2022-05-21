@@ -17,9 +17,10 @@ class Type(
     @Column(name = "typeRooms")
     val rooms: MutableList<Room> = mutableListOf(),
 
-    @Column(unique = true) var name: String = "",
+    @Column var name: String = "",
     var places: Int = 0,
     var price: Int = 0,
+    var isActive: Boolean = true,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int = 0
 ) : BaseEntity<TypeDto, TypePopulatedDto>() {
@@ -33,7 +34,7 @@ class Type(
 
     override fun toDto(): TypeDto {
         return TypeDto(
-            options = this.options.map { it.id },
+            options = this.options.filter { it.isActive }.map { it.id },
             rooms = this.rooms.map { it.id },
             name = this.name,
             places = this.places,
@@ -44,7 +45,7 @@ class Type(
 
     override fun toPopulatedDto(): TypePopulatedDto {
         return TypePopulatedDto(
-            options = this.options.map { it.toDto() },
+            options = this.options.filter { it.isActive }.map { it.toDto() },
             rooms = this.rooms.map { it.toDto() },
             name = this.name,
             places = this.places,

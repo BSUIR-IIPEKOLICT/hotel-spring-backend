@@ -35,7 +35,7 @@ class Booking(
         return BookingDto(
             room = this.room.id,
             createdBy = this.createdBy.id,
-            options = this.options.map { it.id },
+            options = this.options.filter { it.isActive }.map { it.id },
             price = this.price,
             population = this.population,
             startDate = this.startDate,
@@ -49,7 +49,7 @@ class Booking(
         return BookingPopulatedDto(
             room = this.room.toDto(),
             createdBy = this.createdBy.toDto(),
-            options = this.options.map { it.toDto() },
+            options = this.options.filter { it.isActive }.map { it.toDto() },
             price = this.price,
             population = this.population,
             startDate = this.startDate,

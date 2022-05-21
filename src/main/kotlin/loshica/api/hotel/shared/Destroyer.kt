@@ -33,7 +33,7 @@ class Destroyer(
     fun deleteOption(option: Option): Int {
         typeService.removeOption(option)
         bookingService.removeOption(option)
-        return optionService.delete(option.id)
+        return optionService.disable(option.id)
     }
 
     fun deleteRoom(room: Room): Int {

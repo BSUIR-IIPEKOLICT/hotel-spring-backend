@@ -8,6 +8,7 @@ import loshica.api.hotel.models.Type
 import loshica.api.hotel.repositories.TypeRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class TypeService(
@@ -65,5 +66,13 @@ class TypeService(
     override fun clearOptions(type: Type) {
         type.options = mutableListOf()
         repository.save(type)
+    }
+
+    override fun disable(id: Int): Int {
+        val type: Type = getOne(id)
+        type.isActive = false
+        type.name = "${Date().time}-${Math.random()}"
+        repository.save(type)
+        return id
     }
 }

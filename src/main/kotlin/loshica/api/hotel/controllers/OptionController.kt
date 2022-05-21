@@ -3,7 +3,6 @@ package loshica.api.hotel.controllers
 import loshica.api.hotel.annotations.Auth
 import loshica.api.hotel.dtos.DeleteDto
 import loshica.api.hotel.dtos.OptionDto
-import loshica.api.hotel.errors.BadRequestError
 import loshica.api.hotel.interfaces.*
 import loshica.api.hotel.models.Option
 import loshica.api.hotel.models.User
@@ -37,7 +36,9 @@ class OptionController(
     )
 
     @GetMapping
-    fun getAll(): List<OptionDto> = optionService.getAll().map { it.toDto() }
+    fun getAll(): List<OptionDto> = optionService.getAll()
+        .filter { it.isActive }
+        .map { it.toDto() }
 
     @GetMapping(Selector.ID)
     fun getOne(@PathVariable id: Int): OptionDto = optionService.getOne(id).toDto()
@@ -64,11 +65,7 @@ class OptionController(
         @Auth(Role.ADMIN) user: User,
         @PathVariable id: Int
     ): DeleteDto {
-        try {
-            val option: Option = optionService.getOne(id)
-            return DeleteDto(id = destroyer.deleteOption(option))
-        } catch (e: Exception) {
-            throw BadRequestError("Can't delete option with $id id. Try to unbind related entities first")
-        }
+        val option: Option = optionService.getOne(id)
+        return DeleteDto(id = destroyer.deleteOption(option))
     }
 }

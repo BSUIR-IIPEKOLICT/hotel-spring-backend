@@ -4,7 +4,6 @@ import loshica.api.hotel.annotations.Auth
 import loshica.api.hotel.dtos.DeleteDto
 import loshica.api.hotel.dtos.TypeDto
 import loshica.api.hotel.dtos.TypePopulatedDto
-import loshica.api.hotel.errors.BadRequestError
 import loshica.api.hotel.models.Type
 import loshica.api.hotel.interfaces.*
 import loshica.api.hotel.models.User
@@ -38,7 +37,9 @@ class TypeController(
     )
 
     @GetMapping
-    fun getAll(): List<TypePopulatedDto> = typeService.getAll().map { it.toPopulatedDto() }
+    fun getAll(): List<TypePopulatedDto> = typeService.getAll()
+        .filter { it.isActive }
+        .map { it.toPopulatedDto() }
 
     @GetMapping(Selector.ID)
     fun getOne(@PathVariable id: Int): TypePopulatedDto = typeService.getOne(id).toPopulatedDto()
@@ -76,12 +77,8 @@ class TypeController(
         @Auth(Role.ADMIN) user: User,
         @PathVariable id: Int
     ): DeleteDto {
-        try {
-            val type: Type = typeService.getOne(id)
-            type.rooms.forEach { destroyer.deleteRoom(it) }
-            return DeleteDto(id = typeService.delete(id))
-        } catch (e: Exception) {
-            throw BadRequestError("Can't delete type with $id id. Try to unbind related entities first")
-        }
+        val type: Type = typeService.getOne(id)
+        type.rooms.forEach { destroyer.deleteRoom(it) }
+        return DeleteDto(id = typeService.disable(id))
     }
 }
