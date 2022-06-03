@@ -1,1 +1,1 @@
-rootProject.name = "hotel-api"
+rootProject.name = "hotel-spring-backend"

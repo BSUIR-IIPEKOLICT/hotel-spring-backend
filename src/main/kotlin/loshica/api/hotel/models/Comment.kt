@@ -8,7 +8,6 @@ import javax.persistence.*
 @Entity
 class Comment(
     @ManyToOne val room: Room,
-    @ManyToOne val createdBy: User,
 
     var content: String = "",
 
@@ -16,20 +15,10 @@ class Comment(
 ) : BaseEntity<CommentDto, CommentPopulatedDto>() {
 
     override fun toDto(): CommentDto {
-        return CommentDto(
-            room = this.room.id,
-            createdBy = this.createdBy.id,
-            content = this.content,
-            id = this.id
-        )
+        return CommentDto(room = this.room.id, content = this.content, id = this.id)
     }
 
     override fun toPopulatedDto(): CommentPopulatedDto {
-        return CommentPopulatedDto(
-            room = this.room.toDto(),
-            createdBy = this.createdBy.toDto(),
-            content = this.content,
-            id = this.id
-        )
+        return CommentPopulatedDto(room = this.room.toDto(), content = this.content, id = this.id)
     }
 }

@@ -1,16 +1,15 @@
 package loshica.api.hotel.dtos
 
 import com.fasterxml.jackson.annotation.JsonGetter
-import java.util.Date
 
 data class RoomDto (
-    val building: Int = 0,
     val type: Int = 0,
-    val bookings: List<Int> = emptyList(),
     val comments: List<Int> = emptyList(),
+    val description: String = "",
+    val address: String = "",
+    val floor: Int = 1,
+    val places: Int = 1,
     val isFree: Boolean = true,
-    val population: Int = 0,
-    val bookedUntil: Date? = null,
     val id: Int = 0
 ) {
 

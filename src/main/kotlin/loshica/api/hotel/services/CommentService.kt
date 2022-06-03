@@ -4,7 +4,6 @@ import loshica.api.hotel.core.BaseService
 import loshica.api.hotel.interfaces.ICommentService
 import loshica.api.hotel.models.Comment
 import loshica.api.hotel.models.Room
-import loshica.api.hotel.models.User
 import loshica.api.hotel.repositories.CommentRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -14,14 +13,14 @@ class CommentService(
     @Autowired override val repository: CommentRepository
 ) : BaseService<Comment, CommentRepository>(repository), ICommentService {
 
-    override fun create(room: Room, author: User, content: String): Comment {
-        val comment = Comment(room = room, createdBy = author, content = content)
+    override fun create(room: Room, content: String): Comment {
+        val comment = Comment(room = room, content = content)
         repository.save(comment)
         return comment
     }
 
     override fun change(id: Int, content: String): Comment {
-        val comment: Comment = this.getOne(id)
+        val comment: Comment = getOne(id)
         comment.content = content
         repository.save(comment)
         return comment

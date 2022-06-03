@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/hotel-api-2.0.jar
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/hotel-spring-backend-2.1.jar

@@ -1,6 +1,7 @@
 package loshica.api.hotel.services
 
 import loshica.api.hotel.core.BaseService
+import loshica.api.hotel.dtos.RoomDto
 import loshica.api.hotel.interfaces.IRoomService
 import loshica.api.hotel.models.*
 import loshica.api.hotel.repositories.RoomRepository
@@ -12,74 +13,41 @@ class RoomService(
     @Autowired override val repository: RoomRepository
 ) : BaseService<Room, RoomRepository>(repository), IRoomService {
 
-    private fun getByQuery(
-        buildingId: Int?,
-        typeId: Int?,
-        isFree: Boolean?
-    ): Iterable<Room> {
-        var rooms: Iterable<Room> = repository.findAll()
+    override fun create(type: Type, dto: RoomDto): Room {
+        val room = Room(
+            type = type,
+            description = dto.description,
+            address = dto.address,
+            floor = dto.floor,
+            places = dto.places
+        )
 
-        buildingId?.let {
-            rooms = rooms.filter { room -> room.building.id == it }
-        }
-
-        typeId?.let {
-            rooms = rooms.filter { room -> room.type.id == it }
-        }
-
-        isFree?.let {
-            rooms = rooms.filter { room -> room.isFree == it }
-        }
-
-        return rooms
-    }
-
-    override fun get(
-        buildingId: Int?,
-        typeId: Int?,
-        isFree: Boolean?,
-        limit: Int,
-        offset: Int
-    ): Iterable<Room> {
-        val rooms: Iterable<Room> = getByQuery(buildingId, typeId, isFree)
-
-        return rooms
-            .withIndex()
-            .filter { indexedValue: IndexedValue<Room> ->
-                indexedValue.index >= offset && indexedValue.index <= offset + limit
-            }
-            .map { indexedValue: IndexedValue<Room> -> indexedValue.value }
-    }
-
-    override fun getAmount(buildingId: Int?, typeId: Int?, isFree: Boolean?): Int {
-        return getByQuery(buildingId, typeId, isFree).count()
-    }
-
-    override fun create(building: Building, type: Type): Room {
-        val room = Room(building = building, type = type)
         repository.save(room)
         return room
     }
 
-    override fun change(id: Int, building: Building, type: Type): Room {
-        val room: Room = getOne(id)
-        room.change(building = building, type = type)
+    override fun change(id: Int, dto: RoomDto): Room {
+        val room = getOne(id)
+
+        room.description = dto.description
+        room.address = dto.address
+        room.floor = dto.floor
+        room.places = dto.places
+
         repository.save(room)
         return room
     }
 
-    override fun bookRoom(booking: Booking) {
-        booking.room.let {
-            it.book(booking)
-            repository.save(it)
-        }
+    override fun bookRoom(roomId: Int) {
+        val room: Room = getOne(roomId)
+        room.isFree = false
+        repository.save(room)
     }
 
-    override fun unBookRoom(booking: Booking) {
-        booking.room.let {
-            it.unBook(booking)
-            repository.save(it)
-        }
+    override fun unBookRoom(roomId: Int) {
+        val room: Room = getOne(roomId)
+        room.isFree = true
+        repository.save(room)
     }
 
     override fun addComment(comment: Comment) {

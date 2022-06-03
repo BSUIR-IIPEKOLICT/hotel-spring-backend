@@ -5,7 +5,7 @@ import loshica.api.hotel.interfaces.IBaseService
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.findByIdOrNull
 
-open class BaseService<M, R : CrudRepository<M, Int>>(
+abstract class BaseService<M, R : CrudRepository<M, Int>>(
     protected open val repository: R
 ) : IBaseService<M> {
 
