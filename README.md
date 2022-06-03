@@ -24,16 +24,22 @@ git clone git@github.com:BSUIR-IIPEKOLICT/hotel-spring-backend.git
 cd hotel-spring-backend
 ```
 
-Bootstrap project (needed 17 Java):
+Bootstrap locally (needed 17 Java):
 ```shell
+./gradlew build
 ./gradlew bootRun
+```
+
+Bootstrap on heroku (needed 17 Java):
+```shell
+java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/hotel-spring-backend-2.1.jar
 ```
 
 Add heroku remote to project:
 ```shell
 heroku login
 git init
-heroku git:remote -a iipekolict-hotel-sb
+heroku git:remote -a iipekolict--hotel-sb
 ```
 
 Deploy project (to heroku main branch):
