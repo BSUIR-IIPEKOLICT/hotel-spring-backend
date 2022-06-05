@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 class Room(
-    @ManyToOne val type: Type,
+    @ManyToOne var type: Type,
 
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
     val comments: MutableSet<Comment> = mutableSetOf(),

@@ -43,9 +43,20 @@ class RoomController(
     @PutMapping(Selector.ID)
     fun change(
         @RequestBody dto: RoomDto,
+        @RequestParam status: String?,
         @PathVariable id: Int
     ): RoomPopulatedDto {
-        return roomService.change(id = id, dto = dto).toPopulatedDto()
+        typeService.removeRoom(roomService.getOne(id))
+
+        val room: Room = roomService.change(
+            id = id,
+            type = typeService.getOne(dto.type),
+            isFree = status != "booked",
+            dto = dto
+        )
+
+        typeService.addRoom(room)
+        return room.toPopulatedDto()
     }
 
     @DeleteMapping(Selector.ID)

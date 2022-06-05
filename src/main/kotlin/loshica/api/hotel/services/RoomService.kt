@@ -26,28 +26,18 @@ class RoomService(
         return room
     }
 
-    override fun change(id: Int, dto: RoomDto): Room {
+    override fun change(id: Int, type: Type, isFree: Boolean, dto: RoomDto): Room {
         val room = getOne(id)
 
         room.description = dto.description
         room.address = dto.address
         room.floor = dto.floor
         room.places = dto.places
+        room.isFree = isFree
+        room.type = type
 
         repository.save(room)
         return room
-    }
-
-    override fun bookRoom(roomId: Int) {
-        val room: Room = getOne(roomId)
-        room.isFree = false
-        repository.save(room)
-    }
-
-    override fun unBookRoom(roomId: Int) {
-        val room: Room = getOne(roomId)
-        room.isFree = true
-        repository.save(room)
     }
 
     override fun addComment(comment: Comment) {

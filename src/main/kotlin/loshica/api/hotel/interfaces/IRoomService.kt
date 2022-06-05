@@ -5,9 +5,7 @@ import loshica.api.hotel.models.*
 
 interface IRoomService : IBaseService<Room> {
     fun create(type: Type, dto: RoomDto): Room
-    fun change(id: Int, dto: RoomDto): Room
-    fun bookRoom(roomId: Int)
-    fun unBookRoom(roomId: Int)
+    fun change(id: Int, type: Type, isFree: Boolean, dto: RoomDto): Room
     fun addComment(comment: Comment)
     fun removeComment(comment: Comment)
 }
